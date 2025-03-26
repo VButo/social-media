@@ -88,9 +88,6 @@ button{
     margin: 5px;
     font-size: 1.2em;
 }
-button:hover{
-    cursor: pointer;
-}
 
 @media screen and (max-width: 800px){
     .post{

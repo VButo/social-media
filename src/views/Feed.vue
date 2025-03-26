@@ -3,14 +3,15 @@
     <div id="posts">
         <Post v-for="post in posts" :key="post.id" :post="post"/>
     </div>
-    <textarea name="new-post" id="new-post" placeholder="Write post here"></textarea>
-    <input type="file" name="post-image" id="post-image" accept="image/*">
-    <button>Post</button>
+    <aside class="sidebar left-sidebar">
+        <CreatePost />
+    </aside>
 
   </main>
 </template>
 
 <script setup>
+import CreatePost from '@/components/CreatePost.vue'
 import Post from '../components/Post.vue'
 import { ref } from 'vue'
 
@@ -39,8 +40,8 @@ const posts = ref([
 
 <style scoped>
 main{
-    margin-top: 30px;
-    width: 70%;
+    margin-top: 100px;
+    width: 60%;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -53,37 +54,19 @@ main{
     align-items: center;
 }
 
-textarea{
-    color: white;
-    background: #333;
-    min-width: 20vw;
-    height: 100px;
-    margin: 10px;
-    padding: 10px;
-    font-size: 1.2em;
-    border-radius: 15px;
-    border: none;
+.sidebar{
+    width: 25%;
+    position: fixed;
+    top: 10%;
+    overflow-y: auto;
 }
 
-textarea::-webkit-resizer{
-  display: none;
+.left-sidebar{
+    left: 10px;
+    border: 1px solid #333;
+    border-radius: 10px;
 }
 
-button{
-    border: none;
-    background: #333;
-    color: white;
-    padding: 10px 20px;
-    border-radius: 5px;
-    margin: 10px;
-}
-
-input[type="file"]{
-    border: 1px solid #444;
-    padding: 5px;
-    color: white;
-    border-radius: 5px;
-}
 @media screen and (max-width: 800px){
     main{
         width: 100%;

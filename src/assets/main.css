@@ -16,6 +16,7 @@ nav{
   display: flex;
   justify-content: space-between;
   align-items: center;
+  position: fixed;
 }
 
 main{
@@ -60,4 +61,9 @@ nav button{
 
 nav button:hover{
   background: #444;
+}
+
+button:hover{
+  background: #444;
+  cursor: pointer;
 }

@@ -8,12 +8,19 @@ const router = createRouter({
       name: 'feed',
       component: () => import('@/views/Feed.vue'),
     },
+    /* 
     {
       path: '/profile/:username',
       name: 'profile',
       component: () => import('@/views/Profile.vue'),
     },
-    {
+    */
+   {
+    path: '/profile',
+    name: 'profile',
+    component: () => import('@/views/Profile.vue'),
+   },
+   {
       path: '/login',
       name: 'login',
       component: () => import('@/views/Login.vue'),
