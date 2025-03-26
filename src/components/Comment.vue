@@ -7,8 +7,9 @@
     <div>
         <button v-if="!liked" @click="toggleLike" class="commentActions"><FontAwesomeIcon :icon="faHeart"/> {{comment.likes}}</button>
         <button v-else @click="toggleLike" class="commentActions"><FontAwesomeIcon :icon="faHeartSolid"/> {{comment.likes}}</button>
-        <button class="commentActions"><FontAwesomeIcon :icon="faComment" @click="toggleComments"/></button>
+        <button class="commentActions" @click="toggleComments"><FontAwesomeIcon :icon="faComment"/></button>
     </div>
+    <CommentResponse v-if="commentResponseVisible"/>
 </div>
 </template>
 
@@ -19,6 +20,7 @@ import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faComment } from '@fortawesome/free-regular-svg-icons';
 import { defineProps } from 'vue'
+import CommentResponse from './CommentResponse.vue';
 
 const props = defineProps({
     comment: {
@@ -46,14 +48,14 @@ const props = defineProps({
 })
 
 
-const commentsVisible = ref(false)
+const commentResponseVisible = ref(false)
 const liked = ref(props.liked)
 
 const toggleLike = () => {
     liked.value = !liked.value
 }
 const toggleComments = () => {
-    commentsVisible.value = !commentsVisible.value
+    commentResponseVisible.value = !commentResponseVisible.value
 }
 </script>
 
