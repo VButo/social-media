@@ -22,6 +22,7 @@
 
 <script setup>
 import { ref } from 'vue'
+import Post from '../components/Post.vue'
 
 const nickname = ref('Miso')
 const bio = ref('I am a web developer')
@@ -38,11 +39,14 @@ const posts = ref([
 
 <style scoped>
 main{
-    margin-top: 100px;
+    margin: 100px auto;
     width: 60%;
+    padding: 20px;
     border: 1px solid #444;
+    display: block;
 }
 #profile{
+    margin: 0 auto;
     width: 90%;
 }
 .profile-header{
@@ -56,5 +60,16 @@ img{
     border-radius: 50%;
     margin: 20px;
 }
-
+#posts{
+    width: 90%;
+    margin: 50px auto;
+}
+button{
+    border: none;
+    background: #333;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 5px;
+    margin: 10px;
+}
 </style>

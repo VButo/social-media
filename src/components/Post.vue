@@ -66,7 +66,7 @@ img{
 }
 
 .post{
-    width: 70%;
+    width: 100%;
     margin: 10px;
     border: 1px solid #333;
     text-align: center;
