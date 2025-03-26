@@ -10,7 +10,9 @@
 </template>
 
 <script setup>
-
+const submitResponse = () => {
+    
+}
 </script>
 
 <style scoped>

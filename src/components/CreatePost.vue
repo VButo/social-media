@@ -4,8 +4,15 @@
         Upload image
     </label>
     <input id="file-upload" type="file" accept="image/*"/>
-    <button>Post</button>
+    <button @click="post">Post</button>
 </template>
+
+<script setup>
+    const post = () => {
+
+    }
+</script>
+
 
 <style scoped>
 textarea{

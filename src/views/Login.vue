@@ -3,10 +3,10 @@
         <h1>Login</h1>
         <form>
             <label for="username">username / email</label>
-            <input type="text" id="username" name="username">
+            <input type="text" id="username" name="username" required>
             <label for="password">password</label>
-            <input type="password" id="password" name="password">
-            <button>Login</button>
+            <input type="password" id="password" name="password" required>
+            <button @click="login">Login</button>
         </form>
         <RouterLink to="/register">Don't have an account? Register here</RouterLink>
     </div>
@@ -14,9 +14,12 @@
 
 <script setup>
 
+const login = () => {
+    
+}
 </script>
 
-<style>
+<style scoped>
     .login{
         display: flex;
         flex-direction: column;

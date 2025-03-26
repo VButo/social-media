@@ -63,6 +63,15 @@ nav button:hover{
   background: #444;
 }
 
+button{
+  border: none;
+  background: #333;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  margin: 10px;
+}
+
 button:hover{
   background: #444;
   cursor: pointer;
