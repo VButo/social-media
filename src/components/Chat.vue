@@ -162,6 +162,7 @@ const messages = ref([
     align-items: center;
 }
 #profile{
+    max-height: 450px;
     display: flex;
     gap: 10px;
     padding: 10px;
@@ -227,7 +228,7 @@ input[type="text"] {
     display: flex;
     flex-direction: column;
     width: 100%;
-    max-height: 200px;
+    max-height: 450px;
     padding: 5px;
     overflow-y: auto;
     -ms-overflow-style: none;  /* Internet Explorer 10+ */
