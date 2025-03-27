@@ -1,10 +1,12 @@
 <template>
-    <textarea name="new-post" id="new-post" placeholder="Write post here"></textarea>
-    <label for="file-upload" class="custom-file-upload">
-        Upload image
-    </label>
-    <input id="file-upload" type="file" accept="image/*"/>
-    <button @click="post">Post</button>
+    <div id="create-post">
+        <textarea name="new-post" id="new-post" placeholder="Write post here"></textarea>
+        <label for="file-upload" class="custom-file-upload">
+            Upload image
+        </label>
+        <input id="file-upload" type="file" accept="image/*"/>
+        <button @click="post">Post</button>
+    </div>
 </template>
 
 <script setup>
@@ -25,6 +27,7 @@ textarea{
     font-size: 1.2em;
     border-radius: 15px;
     border: none;
+    overflow: hidden;
 }
 
 textarea::-webkit-resizer{
@@ -42,6 +45,7 @@ button{
 
 input[type="file"] {
   display: none;
+  overflow: hidden;
 }
 
 .custom-file-upload {
@@ -51,5 +55,12 @@ input[type="file"] {
     padding: 6px 12px;
     cursor: pointer;
     border-radius: 5px;
+}
+
+@media screen and (max-width: 900px){
+    #create-post{
+        display: none;
+        overflow: hidden;
+    }
 }
 </style>
