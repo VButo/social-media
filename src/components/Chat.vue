@@ -71,6 +71,7 @@ const users = ref([
     { id: 7, uname: 'm_zuckerberg', name: 'Mark Zuckerberg', image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg', bio: 'CEO of Meta' },
     { id: 8, uname: 'l_page', name: 'Larry Page', image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg', bio: 'Co-founder of Google' }
 ])
+
 const user = ref({
     id: 1,
     name: 'Elon Musk',
@@ -132,7 +133,14 @@ const messages = ref([
 </script>
   
 <style scoped>
+#chat-small:hover{
+    cursor: pointer;
 
+}
+
+#profile:hover{
+    background-color: #444;
+}
 .message_user{
     font-size: 1.2em;
     font-weight: bold;
@@ -216,6 +224,10 @@ input[type="text"] {
     cursor: pointer;
     text-align: center;
     font-weight: bold;
+}
+
+.chat-header:hover {
+    background: #444;
 }
 
 .chat-body {

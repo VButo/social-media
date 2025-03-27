@@ -19,6 +19,9 @@
 
 
 <style scoped>
+button:hover{
+    background: #444;
+}
 textarea{
     color: white;
     background: #333;

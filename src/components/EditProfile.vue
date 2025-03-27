@@ -1,6 +1,7 @@
 <template>
-    <div class="backdrop">
-        <div class="modal">
+    <div class="backdrop" @click="closeModal">
+    </div> 
+    <div class="modal">
             <h1>Edit Profile</h1>
             <form @submit.prevent="saveEdit">
                 <label for="nickname">Nickname</label>
@@ -12,7 +13,6 @@
                 <button type="submit">Save</button>
             </form>
         </div>
-    </div> 
 </template>
 
 <script setup>
@@ -31,6 +31,10 @@ const image = ref(props.profile.image)
 const nickname = ref(props.profile.nickname)
 const bio = ref(props.profile.bio)
 
+const closeModal = () => {
+    emit('close')
+}
+
 const saveEdit = () => {
     const editedProfile = ref({
         image: image.value,
@@ -46,6 +50,11 @@ const saveEdit = () => {
 
 <style>
     .modal{
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        position: fixed;
         width: 50%;
         padding: 20px;
         margin: 100px auto;

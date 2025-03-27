@@ -7,11 +7,11 @@
                 <p>{{ post.content }}</p>
             </div>
         </div>
-        <img :src="post.image" alt="Post image">
+        <img :src="post.image" alt="Post image" v-on:dblclick="toggleLike">
         <div>
             <button v-if="!liked" @click="toggleLike"><FontAwesomeIcon :icon="faHeart"/> {{ formattedLikes }}</button>
-            <button v-else @click="toggleLike"><FontAwesomeIcon :icon="faHeartSolid"/> {{ formattedLikes }}</button>
-            <button><FontAwesomeIcon :icon="faComment" @click="toggleComments"/> {{ post.comments.length }}</button>
+            <button v-else @click="toggleLike" style="color: red;"><FontAwesomeIcon :icon="faHeartSolid"/> {{ formattedLikes }}</button>
+            <button><FontAwesomeIcon :icon="faComment" @click="toggleComments" /> {{ post.comments.length }}</button>
             <button><FontAwesomeIcon :icon="faPaperPlane"/> {{ formatedShares }}</button>
         </div>
         <Comments v-if="commentsVisible" :comments="post.comments"/>
