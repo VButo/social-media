@@ -6,15 +6,32 @@
     <aside class="sidebar left-sidebar">
         <CreatePost/>
     </aside>
-
+    <aside class="sidebar right-sidebar">
+        <Chat />
+    </aside>
+    <div id="create-post-small-full-screen" v-if="createPost">
+        <FontAwesomeIcon id="close-create-post" :icon="faArrowLeft" @click="toggleCreatePost"/>
+        <CreatePost/>
+    </div>
   </main>
+    <div id="create-post-small" v-if="!createPost" @click="toggleCreatePost">
+        <FontAwesomeIcon class="closeCreatePost" :icon="faUsersViewfinder"/>
+    </div>
 </template>
 
 <script setup>
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { faUsersViewfinder } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import CreatePost from '@/components/CreatePost.vue'
 import Post from '../components/Post.vue'
 import { ref } from 'vue'
-import ProfileListPage from './ProfileListPage.vue'
+import Chat from '@/components/Chat.vue'
+
+const createPost = ref(false)
+const toggleCreatePost = () => {
+    createPost.value = !createPost.value
+}
 
 const comments1 = ref([
     { id: 1, user: 'User1', text: 'This is a comment', liked: false, likes: 54 },
@@ -46,6 +63,24 @@ const posts = ref([
 </script>
 
 <style scoped>
+#create-post-small-full-screen{
+    display: none;
+}
+#create-post-small{
+    position: fixed;
+    top: 70px;
+    left: 10px;
+    background-color: #333;
+    color: white;
+    border-radius: 50%;
+    padding: 10px;
+    display: none;
+}
+
+.closeCreatePost:hover{
+    cursor: pointer;
+}
+
 main{
     margin-top: 100px;
     width: 60%;
@@ -69,22 +104,56 @@ main{
 }
 
 .left-sidebar{
+    overflow: hidden;
+    height: 200px;
     left: 10px;
     border: 1px solid #333;
     border-radius: 10px;
 }
 
 @media screen and (max-width: 900px){
+    #close-create-post{
+        color: white;
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    #close-create-post:hover{
+        cursor: pointer;
+    }
+    
     main{
         width: 100%;
+        display: flex;
+        flex-direction: row;
+        align-items: left;
+    }
+    #posts{
+        width: 70%;
+        align-items: left;
+        border: none;
     }
     .left-sidebar{
         display: none;
+
     }
-    #posts{
-        width: 90%;
-        border: none;
+    .right-sidebar{
+        width: 100%;
+    }
+    #create-post-small{
+        display: block;
+    }
+    #create-post-small-full-screen{
+        position: fixed;
+        top: 70px;
+        background-color: #111;
+        left: 10px;
+        width: 85%;
+        height: 500px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
     }
 }
-
 </style>

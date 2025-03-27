@@ -1,7 +1,7 @@
 <template>
     <div class="post">
         <div id="user-info">
-            <img :src="post.profile.image" id="profile-picture">
+            <img :src="post.image" id="profile-picture">
             <div id="user-data">
                 <p style="font-weight: bold;" id="u-name">{{ post.profile.name }}</p>
                 <p>{{ post.content }}</p>
@@ -25,22 +25,9 @@ import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faComment } from '@fortawesome/free-regular-svg-icons';
 import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
-
 import { defineProps, ref, computed } from 'vue'
 
 const props = defineProps({
-    /*user: {
-        type: String,
-        required: true
-    },
-    image: {
-        type: String,
-        required: false
-    },
-    content: {
-        type: String,
-        required: true
-    }*/
     post: {
         type: Object,
         required: true
@@ -142,26 +129,16 @@ button{
 }
 
 @media screen and (max-width: 900px){
-    .post{
-        width: 100%;
-    }
     #profile-picture{
         width: 50px;
     }
 
     p{
-        width: 90%;
+        width: 70%;
         margin: 2px;
     }
-    .post {
-        border: none;
-    }
-
 }
-@media screen and (max-width: 500px){
-    .post{
-        width: 100%;
-    }
+@media screen and (max-width: 600px){
     #profile-picture{
         width: 40px;
     }

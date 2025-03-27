@@ -1,6 +1,7 @@
 <template>
-    <div id="create-post">
-        <textarea name="new-post" id="new-post" placeholder="Write post here"></textarea>
+    <div class=""></div>
+    <div class="create-post">
+        <textarea name="new-post" class="new-post" placeholder="Write post here"></textarea>
         <label for="file-upload" class="custom-file-upload">
             Upload image
         </label>
@@ -10,6 +11,7 @@
 </template>
 
 <script setup>
+
     const post = () => {
 
     }
@@ -21,8 +23,8 @@ textarea{
     color: white;
     background: #333;
     min-width: 20vw;
-    height: 100px;
     margin: 10px;
+    height: 100px;
     padding: 10px;
     font-size: 1.2em;
     border-radius: 15px;
@@ -58,8 +60,18 @@ input[type="file"] {
 }
 
 @media screen and (max-width: 900px){
-    #create-post{
-        display: none;
+    .create-post{
+        width: 100%;
+        height: 90%;
+    }
+    textarea{
+        color: white;
+        background: #333;
+        width: 90%;
+        height: 70%;
+        margin-left: 20px;
+        padding: 10px;
+        border: none;
         overflow: hidden;
     }
 }

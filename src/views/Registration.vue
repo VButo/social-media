@@ -6,8 +6,8 @@
             <input type="text" id="username" name="username" required>
             <label for="password">Password</label>
             <input type="password" id="password" name="password" required>
-            <label for="password">Confirm password</label>
-            <input type="password" id="password" name="password" required>
+            <label for="repeatPassword">Confirm password</label>
+            <input type="password" id="repeatPassword" name="password" required>
             <button @click="register">Register</button>
         </form>
         <RouterLink to="/login">Already have an account? Login here</RouterLink>

@@ -3,9 +3,9 @@
         <h1>Login</h1>
         <form>
             <label for="username">username / email</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" name="username" required autocomplete="email username">
             <label for="password">password</label>
-            <input type="password" id="password" name="password" required>
+            <input type="password" id="password" name="password" required autocomplete="current-password">
             <button @click="login">Login</button>
         </form>
         <RouterLink to="/register">Don't have an account? Register here</RouterLink>
