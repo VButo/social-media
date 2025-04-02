@@ -5,7 +5,7 @@ class User {
         this.db = config.db;
     }
 
-    // Register a new user
+    // CREATE A NEW USER(REGISTER)
     async register(username, password, email, fullName) {
         const sql = 'INSERT INTO user (username, password, email, fullName, createdAt) VALUES (?, ?, ?, ?, ?)';
         const time = generateDatabaseDateTime(new Date());
@@ -14,7 +14,7 @@ class User {
         return result[0].insertId;
     }
 
-    //login user
+    //LOGIN USER
     async login(identifier, password) {
         const sql = 'SELECT * FROM user WHERE (username = ? OR email = ?) AND password = ?';
         const values = [identifier, identifier, password];
@@ -25,9 +25,8 @@ class User {
         }
         return result[0][0];
     }
-    async logout() {
 
-    }
+    //FIND ALL USERS
     async findAll() {
         try {
             const sql = 'SELECT * FROM user';
@@ -40,6 +39,7 @@ class User {
         }
     }
     
+    //FIND ONE USER
     async findOne(id) {
         try {
             const sql = 'SELECT * FROM user WHERE userId = ?';
@@ -54,6 +54,42 @@ class User {
             throw error;
         }
     }
+
+    //UPDATE USER
+    async update(data) {
+        const { userId, username, email, fullName, bio, profilePicture } = data;
+        if(!userId || !username || !email || !profilePicture) {
+            return null;
+        }
+
+        let sql = 'SELECT * FROM user WHERE userId = ?';
+        let values = [userId];
+        let result = await this.db.query(sql, values);
+        if (result[0].length === 0) {
+            return null; // User not found
+        }
+
+
+        //Update only the fields that are provided and not null
+        sql = `UPDATE user SET username = ?, email = ?, fullName = ?${bio ? ', bio = ?' : ''}${profilePicture ? ', profilePicture = ?' : ''} WHERE userId = ?`;
+        values = [username, email, fullName, bio, profilePicture, userId];
+        // Remove undefined values from the array
+        values = values.filter(value => value);
+        result = await this.db.query(sql, values);
+        return result[0].affectedRows > 0;
+    }
+
+    //DELETE USER
+    
+
+    //FOLLOW USER
+
+    //UNFOLLOW USER
+
+    //GET FOLLOWERS
+
+    //GET FOLLOWING
+    
 }
 
 function generateDatabaseDateTime(date) {
