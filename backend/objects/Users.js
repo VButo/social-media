@@ -1,5 +1,5 @@
 // login register, login, logout, user info, follow, unfollow, get followers, get following, get user by id, get user by username, update user info, delete user
-
+import argon2 from 'argon2';
 class User {
     constructor(config) {
         this.db = config.db;
@@ -8,22 +8,33 @@ class User {
     // CREATE A NEW USER(REGISTER)
     async register(username, password, email, fullName) {
         const sql = 'INSERT INTO user (username, password, email, fullName, createdAt) VALUES (?, ?, ?, ?, ?)';
-        const time = generateDatabaseDateTime(new Date());
-        const values = [username, password, email, fullName, time];
+        const hashedPassword = await argon2.hash(password);
+        const time = new Date().toISOString().replace("T"," ").substring(0, 19);
+        const values = [username, hashedPassword, email, fullName, time];
         const result = await this.db.query(sql, values);
         return result[0].insertId;
     }
 
+    //CHECK IF USER EXISTS
+    async userExists(username, email) {
+        const sql = 'SELECT * FROM user WHERE username = ? OR email = ? LIMIT 1';
+        const values = [username, email];
+        const result = await this.db.query(sql, values);
+        return result[0].length > 0;
+    }
+
     //LOGIN USER
     async login(identifier, password) {
-        const sql = 'SELECT * FROM user WHERE (username = ? OR email = ?) AND password = ?';
-        const values = [identifier, identifier, password];
+        const sql = 'SELECT * FROM user WHERE username = ? OR email = ?';
+        const values = [identifier, identifier];
         const result = await this.db.query(sql, values);
 
-        if (result[0].length === 0) {
-            return null; 
-        }
-        return result[0][0];
+        if (result[0].length === 0) return null;
+
+        const user = result[0][0];
+        const passwordValid = await argon2.verify(user.password, password);
+        if (!passwordValid) return null;
+        return user;
     }
 
     //FIND ALL USERS
@@ -41,18 +52,10 @@ class User {
     
     //FIND ONE USER
     async findOne(id) {
-        try {
-            const sql = 'SELECT * FROM user WHERE userId = ?';
-            const values = [id];
-            const result = await this.db.query(sql, values);
-            if (result[0].length === 0) {
-                return null;
-            }
-            return result[0]; // Return the user data
-        } catch (error) {
-            console.error(`Error: ${error}`);
-            throw error;
-        }
+        const sql = 'SELECT * FROM user WHERE userId = ?';
+        const values = [id];
+        const result = await this.db.query(sql, values);
+        return result[0][0] || null;
     }
 
     //UPDATE USER
@@ -80,20 +83,55 @@ class User {
     }
 
     //DELETE USER
-    
+    async delete(userId) {
+        try{
+            const user = await this.findOne(userId);
+            if (!user) {
+                return null; // User not found
+            }
+            const sql = 'DELETE FROM user WHERE userId = ?';
+            const values = [userId];
+            const result = await this.db.query(sql, values);
+            return result[0].affectedRows > 0;
+        }
+        catch (error) {
+            console.error(`Error: ${error}`);
+            throw error;
+        }
+    }
 
-    //FOLLOW USER
+    // FOLLOW USER
+    async follow(userId, targetUserId) {
+        const sql = 'INSERT INTO follows (followerId, followingId) VALUES (?, ?)';
+        const values = [userId, targetUserId];
+        const result = await this.db.query(sql, values);
+        return result[0].affectedRows > 0;
+    }
 
-    //UNFOLLOW USER
+    // UNFOLLOW USER
+    async unfollow(userId, targetUserId) {
+        const sql = 'DELETE FROM follows WHERE followerId = ? AND followingId = ?';
+        const values = [userId, targetUserId];
+        const result = await this.db.query(sql, values);
+        return result[0].affectedRows > 0;
+    }
 
     //GET FOLLOWERS
+    async getFollowers(userId) {
+        const sql = 'SELECT * FROM user WHERE userId IN (SELECT followerId FROM follows WHERE followingId = ?)';
+        const values = [userId];
+        const result = await this.db.query(sql, values);
+        return result[0];
+    }
 
     //GET FOLLOWING
+    async getFollowing(userId) {
+        const sql = 'SELECT * FROM user WHERE userId IN (SELECT followingId FROM follows WHERE followerId = ?)';
+        const values = [userId];
+        const result = await this.db.query(sql, values);
+        return result[0];
+    }
     
-}
-
-function generateDatabaseDateTime(date) {
-    return date.toISOString().replace("T"," ").substring(0, 19);
 }
 
 export default User;

@@ -8,7 +8,7 @@ const db_connection = await connectDB();
 
 // Middleware to add the DB connection to request object
 app.use((req, res, next) => {
-    req.db = db_connection; // Pass the db connection to the request object
+    req.db = db_connection;
     next();
 });
 
