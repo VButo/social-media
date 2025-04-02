@@ -5,12 +5,19 @@ class User {
         this.db = config.db;
     }
 
+//${bio ? 'bio,':''}${profilePicture?'profilePicture':''}
+//${bio ? ', ?':''}${profilePicture ? ', ?':''}
+//, bio, profilePicture
+
     // CREATE A NEW USER(REGISTER)
-    async register(username, password, email, fullName) {
-        const sql = 'INSERT INTO user (username, password, email, fullName, createdAt) VALUES (?, ?, ?, ?, ?)';
+    async register(data) {
+        const { username, password, email, fullName, bio, profilePicture } = data;
+        const sql = `INSERT INTO user (username, password, email, fullName,${bio ? ' bio,':''}
+        ${profilePicture?' profilePicture,':''} createdAt) VALUES (?, ?, ?, ?, ?${bio ? ', ?':''}${profilePicture ? ', ?':''})`;
         const hashedPassword = await argon2.hash(password);
         const time = new Date().toISOString().replace("T"," ").substring(0, 19);
-        const values = [username, hashedPassword, email, fullName, time];
+        let values = [username, hashedPassword, email, fullName, bio, profilePicture, time];
+        values = values.filter(value => value !== undefined && value !== null);
         const result = await this.db.query(sql, values);
         return result[0].insertId;
     }
@@ -59,12 +66,8 @@ class User {
     }
 
     //UPDATE USER
-    async update(data) {
-        const { userId, username, email, fullName, bio, profilePicture } = data;
-        if(!userId || !username || !email || !profilePicture) {
-            return null;
-        }
-
+    async update(userId, data) {
+        const { username, email, fullName, bio, profilePicture } = data;
         let sql = 'SELECT * FROM user WHERE userId = ?';
         let values = [userId];
         let result = await this.db.query(sql, values);
@@ -74,7 +77,7 @@ class User {
 
 
         //Update only the fields that are provided and not null
-        sql = `UPDATE user SET username = ?, email = ?, fullName = ?${bio ? ', bio = ?' : ''}${profilePicture ? ', profilePicture = ?' : ''} WHERE userId = ?`;
+        sql = `UPDATE user SET ${username ? 'username = ?' : ''}${email ? ', email = ?':''}${fullName?', fullName = ?':''}${bio ? ', bio = ?' : ''}${profilePicture ? ', profilePicture = ?' : ''} WHERE userId = ?`;
         values = [username, email, fullName, bio, profilePicture, userId];
         // Remove undefined values from the array
         values = values.filter(value => value);
@@ -102,23 +105,33 @@ class User {
 
     // FOLLOW USER
     async follow(userId, targetUserId) {
-        const sql = 'INSERT INTO follows (followerId, followingId) VALUES (?, ?)';
+        const sql = 'INSERT INTO follow (followerUserId, followingUserId, createdAt) VALUES (?, ?, NOW())';
         const values = [userId, targetUserId];
-        const result = await this.db.query(sql, values);
-        return result[0].affectedRows > 0;
+        try {
+            const [result] = await this.db.query(sql, values);
+            return result.affectedRows > 0;
+        } catch (error) {
+            console.error(`Error while following user: ${error}`);
+            throw error;
+        }
     }
 
     // UNFOLLOW USER
     async unfollow(userId, targetUserId) {
-        const sql = 'DELETE FROM follows WHERE followerId = ? AND followingId = ?';
+        const sql = 'DELETE FROM follow WHERE followerUserId = ? AND followingUserId = ?';
         const values = [userId, targetUserId];
-        const result = await this.db.query(sql, values);
-        return result[0].affectedRows > 0;
+        try{
+            const [result] = await this.db.query(sql, values);
+            return result.affectedRows > 0;
+        } catch (error) {
+            console.error(`Error while unfollowing user: ${error}`);
+            throw error;
+        }
     }
 
     //GET FOLLOWERS
     async getFollowers(userId) {
-        const sql = 'SELECT * FROM user WHERE userId IN (SELECT followerId FROM follows WHERE followingId = ?)';
+        const sql = 'SELECT * FROM user WHERE userId IN (SELECT followerUserId FROM follow WHERE followingUserId = ?)';
         const values = [userId];
         const result = await this.db.query(sql, values);
         return result[0];
@@ -126,7 +139,7 @@ class User {
 
     //GET FOLLOWING
     async getFollowing(userId) {
-        const sql = 'SELECT * FROM user WHERE userId IN (SELECT followingId FROM follows WHERE followerId = ?)';
+        const sql = 'SELECT * FROM user WHERE userId IN (SELECT followingUserId FROM follow WHERE followerUserId = ?)';
         const values = [userId];
         const result = await this.db.query(sql, values);
         return result[0];

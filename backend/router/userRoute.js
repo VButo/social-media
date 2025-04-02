@@ -9,14 +9,14 @@ const router = express.Router();
 // Register route
 router.post('/register', async (req, res) => {
     try {
-        const { username, password, email, fullName } = req.body;
+        const { username, email } = req.body;
         const user = new User({ db: req.db });
 
         if(await user.userExists(username, email)){
             return res.status(400).json({ error: "User already exists" });
         }
 
-        const newUserId = await user.register(username, password, email, fullName);
+        const newUserId = await user.register(req.body);
 
         const token = jwt.sign({ userId: newUserId }, process.env.JWT_SECRET, { expiresIn:process.env.JWT_EXPIRATION });
         res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "strict" });
@@ -68,7 +68,7 @@ router.post('/logout', (req, res) => {
 router.put('/:id', async(req, res) => {
     try{
         const user = new User({ db: req.db });
-        const success = await user.update(req.params.id);
+        const success = await user.update(req.params.id, req.body);
 
         if (!success) return res.status(404).json({ error: 'User not found' });
         
@@ -98,9 +98,9 @@ router.delete('/:id', async (req, res) => {
 // Follow route
 router.post('/:id/follow', async (req, res) => {
     try {
-        const { targetUserId } = req.body;
+        const { userId } = req.body;
         const user = new User({ db: req.db });
-        const success = await user.follow(req.params.id, targetUserId);
+        const success = await user.follow(req.params.id, userId);
         if (!success) return res.status(400).json({ error: "Follow request failed" });
         res.status(200).json({ message: "User followed successfully" });
     } catch (error) {
@@ -112,9 +112,9 @@ router.post('/:id/follow', async (req, res) => {
 // Unfollow route
 router.post('/:id/unfollow', async (req, res) => {
     try {
-        const { targetUserId } = req.body;
+        const { userId } = req.body;
         const user = new User({ db: req.db });
-        const success = await user.unfollow(req.params.id, targetUserId);
+        const success = await user.unfollow(req.params.id, userId);
         if (!success) return res.status(400).json({ error: "Unfollow request failed" });
         res.status(200).json({ message: "User unfollowed successfully" });
     } catch (error) {
