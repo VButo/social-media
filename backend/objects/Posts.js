@@ -72,6 +72,21 @@ class Post {
     const result = await this.db.query(sql, values);
     return result[0];
   }
+
+  //GET ALL POSTS FROM USERS FOLLOWED BY USER
+  async getFollowedPosts(userId) {
+    const sql = `SELECT p.*, u.username, u.profilePicture, u.userId AS authorId, COUNT(l.postId) AS likeCount, COUNT(c.postId) AS commentCount
+                 FROM post p
+                 JOIN user u ON p.userId = u.userId
+                 LEFT JOIN mydb.like l ON p.postId = l.postId
+                 LEFT JOIN mydb.comment c ON p.postId = c.postId
+                 WHERE p.userId IN (SELECT followingUserId FROM follow WHERE followerUserId = ?)
+                 GROUP BY p.postId
+                 ORDER BY p.createdAt DESC;`;
+    const values = [userId];
+    const result = await this.db.query(sql, values);
+    return result[0];
+  }
 }
 
 export default Post;

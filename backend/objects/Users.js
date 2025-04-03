@@ -75,9 +75,9 @@ class User {
             return null; // User not found
         }
 
-
+        let updateFields = [username ? 'username = ?' : '', email ? 'email = ?' : '', fullName ? 'fullName = ?' : '', bio ? 'bio = ?' : '', profilePicture ? 'profilePicture = ?' : ''].filter(Boolean).join(', ');
         //Update only the fields that are provided and not null
-        sql = `UPDATE user SET ${username ? 'username = ?' : ''}${email ? ', email = ?':''}${fullName?', fullName = ?':''}${bio ? ', bio = ?' : ''}${profilePicture ? ', profilePicture = ?' : ''} WHERE userId = ?`;
+        sql = `UPDATE user SET ${updateFields} WHERE userId = ?`;
         values = [username, email, fullName, bio, profilePicture, userId];
         // Remove undefined values from the array
         values = values.filter(value => value);

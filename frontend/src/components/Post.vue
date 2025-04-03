@@ -1,17 +1,17 @@
 <template>
     <div class="post">
         <div id="user-info" @click="visitProfile">
-            <img :src="post.profile.image" id="profile-picture">
+            <img :src="post.profilePicture" id="profile-picture">
             <div id="user-data">
-                <p style="font-weight: bold;" id="u-name">{{ post.profile.name }}</p>
-                <p>{{ post.content }}</p>
+                <p style="font-weight: bold;" id="u-name">{{ post.username }}</p>
+                <p>{{ post.caption }}</p>
             </div>
         </div>
         <img :src="post.image" alt="Post image" v-on:dblclick="toggleLike">
         <div>
             <button v-if="!liked" @click="toggleLike"><FontAwesomeIcon :icon="faHeart"/> {{ formattedLikes }}</button>
             <button v-else @click="toggleLike" style="color: red;"><FontAwesomeIcon :icon="faHeartSolid"/> {{ formattedLikes }}</button>
-            <button><FontAwesomeIcon :icon="faComment" @click="toggleComments" /> {{ post.comments.length }}</button>
+            <button><FontAwesomeIcon :icon="faComment" @click="toggleComments" /> {{ post.commentCount }}</button>
             <button><FontAwesomeIcon :icon="faPaperPlane"/> {{ formatedShares }}</button>
         </div>
         <Comments v-if="commentsVisible" :comments="post.comments"/>
@@ -50,7 +50,7 @@ const formatedShares = computed(() => {
 
 // Computed property to format likes
 const formattedLikes = computed(() => {
-    const likes = props.post.likes;
+    const likes = props.post.likeCount;
     if (likes >= 1000000) {
         return (likes / 1000000).toFixed(1).replace(/\.0$/, '') + 'M'; // 2M
     } else if (likes >= 1000) {
@@ -59,8 +59,15 @@ const formattedLikes = computed(() => {
     return likes;
 });
 
-const toggleLike = () => {
+async function toggleLike() {
     liked.value = !liked.value
+    const url = `http://localhost:3000/api/posts/${props.post.id}/${!liked.value?'un':''}like`;
+
+    const response = await fetch(url, {
+        method: 'POST',
+        body: JSON.stringify({ userId: props.post.authorId })
+    })
+    return response.json()
 }
 const toggleComments = () => {
 
@@ -70,7 +77,7 @@ const toggleComments = () => {
 const router = useRouter()
 
 const visitProfile = () => {
-    router.push(`/profile/${props.post.profile.id}`);
+    router.push(`/profile/${props.post.authorId}`);
 }
 </script>
 
@@ -90,6 +97,8 @@ const visitProfile = () => {
 
 #profile-picture{
     width: 50px;
+    height: 50px;
+    object-fit: cover;
     border-radius: 50%;
     margin: 10px;
 }

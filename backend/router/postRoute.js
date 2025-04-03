@@ -107,4 +107,18 @@ router.get("/:postId/likes", async (req, res) => {
     }
 });
 
+//GET ALL POSTS FROM USERS FOLLOWED BY USER
+router.get("/:userId/followedPosts", async (req, res) => {
+    const userId = req.params.userId;
+    const post = new Post({ db: req.db });
+    try{
+        const followedPosts = await post.getFollowedPosts(userId);
+        if (!followedPosts) return res.status(404).json({ error: "Posts not found" });
+        res.status(200).json(followedPosts);
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 export default router;
