@@ -1,6 +1,5 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
-import dotenv from 'dotenv';
 
 import User from '../objects/Users.js'; // Adjust the path as necessary
 
@@ -143,6 +142,31 @@ router.get('/:id/following', async (req, res) => {
         const following = await user.getFollowing(req.params.id);
         if (!following) return res.status(404).json({ error: 'User not found' });
         res.status(200).json(following);
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Get all users route
+router.get('/', async (req, res) => {
+    try {
+        const user = new User({ db: req.db });
+        const users = await user.findAll();
+        res.status(200).json(users);
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+// Get user by ID route
+router.get('/:id', async (req, res) => {
+    try {
+        const user = new User({ db: req.db });
+        const userData = await user.findOne(req.params.id);
+        if (!userData) return res.status(404).json({ error: 'User not found' });
+        res.status(200).json(userData);
     } catch (error) {
         console.error(`Error: ${error}`);
         res.status(500).json({ error: 'Internal server error' });

@@ -1,7 +1,7 @@
 import mysql from 'mysql2/promise';
-import dotenv from 'dotenv';
-dotenv.config();
+import dotenv from 'dotenv'
 
+dotenv.config('../.env');
 export const connectDB = async () => {
     try{
         const connection = await mysql.createConnection({

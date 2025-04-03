@@ -25,8 +25,27 @@ import { faUsersViewfinder } from '@fortawesome/free-solid-svg-icons';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import CreatePost from '@/components/CreatePost.vue'
 import Post from '../components/Post.vue'
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import Chat from '@/components/Chat.vue'
+
+const url = 'http://localhost:3000/api/users'
+
+async function fetchFollowers(userId){
+    try{
+        const response = await fetch(`${url}/${userId}/followers`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(data)
+    } catch(error) {
+        console.error('There has been a problem with your fetch operation:', error);
+    }
+}
+
+onMounted(() => {
+    fetchFollowers(3)
+})
 
 const createPost = ref(false)
 const toggleCreatePost = () => {

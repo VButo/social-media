@@ -94,8 +94,8 @@ class User {
             }
             const sql = 'DELETE FROM user WHERE userId = ?';
             const values = [userId];
-            const result = await this.db.query(sql, values);
-            return result[0].affectedRows > 0;
+            const [result] = await this.db.query(sql, values);
+            return result.affectedRows > 0;
         }
         catch (error) {
             console.error(`Error: ${error}`);
@@ -144,7 +144,6 @@ class User {
         const result = await this.db.query(sql, values);
         return result[0];
     }
-    
 }
 
 export default User;
