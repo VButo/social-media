@@ -4,20 +4,20 @@
     <div class="modal">
             <h1>Edit Profile</h1>
             <form @submit.prevent="saveEdit">
-                <label for="nickname">Nickname</label>
-                <input type="text" id="nickname" v-model="nickname">
+                <label for="username">Username</label>
+                <input type="text" id="username" v-model="username">
                 <label for="bio">Bio</label>
                 <textarea id="bio" v-model="bio"></textarea>
-                <label for="image">Profile Image</label>
-                <input type="text" id="image" v-model="image">
+                <label for="profilePicture">Profile Image</label>
+                <input type="text" id="profilePicture" v-model="profilePicture">
                 <button type="submit">Save</button>
             </form>
         </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { defineProps } from 'vue'
+import { ref, defineProps } from 'vue'
+import axios from 'axios'
 
 const emit = defineEmits(['editProfile', 'close'])
 
@@ -27,20 +27,29 @@ const props = defineProps({
         required: true
     }
 })
-const image = ref(props.profile.image)
-const nickname = ref(props.profile.nickname)
+const profilePicture = ref(props.profile.profilePicture)
+const username = ref(props.profile.username)
 const bio = ref(props.profile.bio)
 
 const closeModal = () => {
     emit('close')
 }
 
-const saveEdit = () => {
+async function saveEdit() { 
+    console.log(props.profile)
     const editedProfile = ref({
-        image: image.value,
-        nickname: nickname.value,
+        profilePicture: profilePicture.value,
+        username: username.value,
         bio: bio.value
     })
+    console.log('edited: '+ editedProfile.value)
+    const response = await axios.put(`http://localhost:3000/api/users/${props.profile.userId}`, editedProfile.value, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+    console.log(response.data)
+    if (response.status !== 200) {
+        throw new Error('Network response was not ok');
+    }
     console.log(editedProfile)
     emit('editProfile', editedProfile)
     emit('close')

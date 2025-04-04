@@ -2,19 +2,21 @@
     <main>
         <div id="profile">
             <div class="profile-header">
-                <img :src="profile.image" alt="Profile picture">
+                <img :src="`http://localhost:5173/${profile.profilePicture}`" alt="Profile picture">
                 <div>
                     <button @click="toggleEdit = !toggleEdit">Edit profile</button>
                     <button>Logout</button>
                 </div>
             </div>
             <hr>
-            <h1>{{ profile.nickname }}</h1>
+            <h1>{{ profile.fullName }}</h1>
             <p>{{ profile.username }}</p>
             <p>{{ profile.bio }}</p>
             <hr v-if="posts.length > 0">
         </div>
         <div id="posts">
+            <p v-if="posts.length === 0"></p>
+            <h1 v-if="posts.length === 0" style="margin: 0 auto;">No posts yet!</h1>
             <Post v-for="post in posts" :key="post.id" :post="post"/>
         </div>
         <EditProfile v-if="toggleEdit" :profile="profile" @editProfile="handleEditProfile" @close="handleClose"/>
@@ -22,60 +24,68 @@
 </template>
 
 <script setup>
-import { ref, defineProps } from 'vue'
+import { ref, defineProps, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Post from '../components/Post.vue'
 import EditProfile from '@/components/EditProfile.vue'
+import axios from 'axios'
 
 window.scrollTo(0, 0)
-const route = useRoute()
-const userId = route.params.id
 
-const nickname = ref('Miso')
-const bio = ref('I am a web developer')
-const username = ref('miso_kolac')
-const image = ref('https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg')
+const postExists = ref(false)
 
-const props = defineProps({
-    profile: {
-        type: Array,
-        required: true
+const profile = ref({})
+const posts = ref([])
+
+async function getUserProfile(userId) {
+    try {
+        const response = await axios.get(`http://localhost:3000/api/users/${userId}`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        if (response.status !== 200) {
+            throw new Error('Network response was not ok');
+        }
+        const data = response.data;
+        console.log(data)
+        
+        profile.value = data
+        console.log("profile image:" + profile.value.profilePicture)
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
     }
+}
+
+async function getUserPosts(userId) {
+    try {
+        const response = await axios.get(`http://localhost:3000/api/posts/${userId}`, {
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+        });
+        if (response.status !== 200) {
+            throw new Error('Network response was not ok');
+        }
+        const data = response.data;
+        console.log(data)
+        posts.value = data
+        postExist(posts.value)
+    } catch (error) {
+        console.error('There has been a problem with your fetch operation:', error);
+    }
+}
+
+const postExist = (posts) => {
+    if (posts.length > 0) {
+        return true
+    } else {
+        return false
+    }
+}
+
+onMounted(() => {
+    const route = useRoute()
+    const userId = route.params.id
+    getUserProfile(userId)
+    getUserPosts(userId)
 })
-
-
-const profile = ref({ nickname: nickname.value, bio: bio.value, username: username.value, image: image.value })
-
-const comments1 = ref([
-    { id: 1, user: 'User1', text: 'This is a comment', liked: false, likes: 54 },
-    { id: 2, user: 'User2', text: 'This is another comment', liked: false, likes: 13},
-    { id: 3, user: 'User3', text: 'Amazing post!', liked: false, likes: 23 },
-    { id: 4, user: 'User4', text: 'I totally agree!', liked: false, likes: 45 },
-    { id: 5, user: 'User5', text: 'Thanks for sharing!', liked: false, likes: 12 }
-])
-const comments2 = ref([
-    { id: 1, user: 'User1', text: 'This is a comment', liked: false, likes: 54 },
-    { id: 2, user: 'User2', text: 'This is another comment', liked: false, likes: 13},
-])
-const comments3 = ref([
-    { id: 4, user: 'User4', text: 'I totally agree!', liked: false, likes: 45 },
-    { id: 5, user: 'User5', text: 'Thanks for sharing!', liked: false, likes: 12 }
-])
-
-const profiles = ref([
-    { id: 1, name: 'Elon Musk', image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg' },
-    { id: 2, name: 'Donald J. Trump', image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg' },
-    { id: 3, name: 'Alex', image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg' }
-])
-
-const posts = ref([
-    { id: 1, profile: profiles.value[0], image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg', content: 'This is a post', comments: comments1, likes: 430232, shares: 32 },
-    { id: 2, profile: profiles.value[1], image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg', content: 'FIGHT, FIGHT, FIGHT!!!', comments: comments2, likes:202, shares: 13 },
-    { id: 3, profile: profiles.value[2], image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg', content: 'This is a third post', comments: comments3, likes: 123, shares: 5 },
-    { id: 4, profile: profiles.value[0], image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg', content: 'This is a post', comments: comments1, likes: 430232, shares: 32 },
-    { id: 5, profile: profiles.value[1], image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg', content: 'FIGHT, FIGHT, FIGHT!!!', comments: comments2, likes:202, shares: 13 },
-    { id: 6, profile: profiles.value[2], image: 'https://upload.wikimedia.org/wikipedia/en/a/a9/Example.jpg', content: 'This is a third post', comments: comments3, likes: 123, shares: 5 }
-])
 
 const handleEditProfile = (editedProfile) => {
     profile.value = editedProfile.value

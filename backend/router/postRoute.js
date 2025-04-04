@@ -1,15 +1,29 @@
 import e from "express";
+import multer from "multer";
+import path from "path";
 
 import Post from "../objects/Posts.js";
 const router = e.Router();
 
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, path.join(__dirname, "public/images/postImages"));
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
+      cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+    }
+  });
+
+  const upload = multer({ storage: storage, limits: { fileSize: 500 * 1024 } }).single("image");
+
+//GET ALL POSTS FROM A USER
 router.get("/:userId", async (req, res) => {
     const userId = req.params.userId;
-    console.log(`Recieved userId: ${userId}`);
     const post = new Post({ db: req.db });
     try{
         const userPosts = await post.getAllPosts(userId);
-        console.log(`Recieved userPosts: ${userPosts}`);
         if (!userPosts) return res.status(404).json({ error: "Posts not found" });
         res.status(200).json(userPosts);
     } catch (error) {
@@ -18,13 +32,12 @@ router.get("/:userId", async (req, res) => {
     }
 });
 
+//Get post by id
 router.get('/:postId/post', async (req, res) => {
     const postId = req.params.postId;
-    console.log(`Recieved postId: ${postId}`);
     const post = new Post({ db: req.db });
     try{
         const userPosts = await post.getPost(postId);
-        console.log(`Recieved userPosts: ${userPosts}`);
         if (!userPosts) return res.status(404).json({ error: "Post not found" });
         res.status(200).json(userPosts);
     } catch (error) {
@@ -40,7 +53,6 @@ router.post("/:userId", async(req, res) => {
     const post = new Post({ db: req.db });
     try{
         const newPost = await post.createPost(createPost);
-        console.log(`Recieved newPost: ${newPost}`);
         if (!newPost) return res.status(404).json({ error: "Couldn't create the post" });
         res.status(200).json('Post created successfully!');
     } catch (error) {

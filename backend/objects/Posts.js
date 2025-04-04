@@ -1,3 +1,5 @@
+import multer from "multer";
+import path from "path";
 class Post {
   constructor(config) {
     this.db = config.db;
@@ -5,13 +7,15 @@ class Post {
 
   // GET ALL USER POSTS
   async getAllPosts(userId) {
-    const sql = `SELECT p.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt,COUNT(l.postId) AS likeCount, COUNT(c.postId) AS commentCount
+    const sql = `SELECT p.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt 
+                 AS userCreatedAt,COUNT(l.postId) AS likeCount, COUNT(c.postId) AS commentCount
                  FROM post p
                  JOIN user u ON p.userId = u.userId
-                 LEFT JOIN mydb.like l ON p.postId = l.postId
-                 LEFT JOIN mydb.comment c ON p.postId = c.postId
-                 WHERE p.userId = 1
-                 ORDER BY p.createdAt DESC;`;
+                 LEFT JOIN \`like\` l ON p.postId = l.postId
+                 LEFT JOIN comment c ON p.postId = c.postId
+                 WHERE p.userId = ?
+                 GROUP BY p.postId
+                 ORDER BY createdAt DESC;`;
     const values = [userId];
     const result = await this.db.query(sql, values);
     return result[0];
@@ -20,11 +24,11 @@ class Post {
   // GET POST BY ID
   async getPost(postId) {
     const sql = `SELECT p.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt,COUNT(l.postId) AS likeCount, COUNT(c.postId) AS commentCount
-	    FROM mydb.post p
-	    JOIN mydb.user u ON p.userId = u.userId
-	    LEFT JOIN mydb.like l ON p.postId = l.postId
-      LEFT JOIN mydb.comment c ON p.postId = c.postId
-	    WHERE p.postId = 1
+	    FROM post p
+	    JOIN user u ON p.userId = u.userId
+	    LEFT JOIN \`like\` l ON p.postId = l.postId
+      LEFT JOIN comment c ON p.postId = c.postId
+	    WHERE p.postId = ?
 	    GROUP BY p.postId;`;
     const values = [postId];
     const result = await this.db.query(sql, values);
@@ -78,8 +82,8 @@ class Post {
     const sql = `SELECT p.*, u.username, u.profilePicture, u.userId AS authorId, COUNT(l.postId) AS likeCount, COUNT(c.postId) AS commentCount
                  FROM post p
                  JOIN user u ON p.userId = u.userId
-                 LEFT JOIN mydb.like l ON p.postId = l.postId
-                 LEFT JOIN mydb.comment c ON p.postId = c.postId
+                 LEFT JOIN \`like\` l ON p.postId = l.postId
+                 LEFT JOIN comment c ON p.postId = c.postId
                  WHERE p.userId IN (SELECT followingUserId FROM follow WHERE followerUserId = ?)
                  GROUP BY p.postId
                  ORDER BY p.createdAt DESC;`;

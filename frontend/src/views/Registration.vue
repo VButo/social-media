@@ -1,23 +1,79 @@
 <template>
     <div class="register">
         <h1>Register</h1>
-        <form>
+        <form @submit.prevent="register">
             <label for="username">Username</label>
-            <input type="text" id="username" name="username" required>
+            <input v-model="username" type="text" id="username" name="username" required>
+            <label for="email">Email</label>
+            <input v-model="email" type="email" id="email" name="email" @input="validateEmail" required>
+            <p v-if="emailError" style="color: red">{{ emailError }}</p>
+            <label for="fullName">Full Name</label>
+            <input v-model="fullName" type="text" id="fullName" name="fullName" required>
             <label for="password">Password</label>
-            <input type="password" id="password" name="password" required>
+            <input v-model="password" type="password" id="password" name="password" required>
             <label for="repeatPassword">Confirm password</label>
-            <input type="password" id="repeatPassword" name="password" required>
-            <button @click="register">Register</button>
+            <input v-model="repeatPassword" type="password" id="repeatPassword" name="password" @input="validatePasswordMatch" required>
+            <p v-if="passwordError" style="padding: 0; color: red; margin: 0 ">{{ passwordError }}</p>
+            <button :disabled="!isFormValid">Register</button>
         </form>
         <RouterLink to="/login">Already have an account? Login here</RouterLink>
     </div>
 </template>
 
 <script setup>
+import axios from 'axios';
+import { ref, computed } from 'vue';
+
+const username = ref('');
+const email = ref();
+const fullName = ref('');
+const password = ref();
+const repeatPassword = ref();
+console.log(password.value, repeatPassword.value);
+
+// Error messages
+const emailError = ref('');
+const passwordError = ref('');
+
+// Validation logic
+const validateEmail = () => {
+  
+};
+
+const validatePasswordMatch = () => {
+  passwordError.value =
+    password.value === repeatPassword.value
+      ? ''
+      : 'Passwords do not match.';
+};
+
+// Computed property to check if the form is valid
+const isFormValid = computed(() => {
+  return (
+    emailError.value === '' &&
+    passwordError.value === '' &&
+    email.value &&
+    password.value &&
+    repeatPassword.value
+  );
+});
 
 const register = () => {
-    
+    axios.post('http://localhost:3000/api/users/register', {
+        username: username.value,
+        password: password.value,
+        email: email.value,
+        fullName: fullName.value
+    }).then(res => console.log(res.data)).catch(err => {
+        console.log(err.response.data);
+        if (err.response.status === 400) {
+            alert("Username or email already exists");
+        } else if (err.response.status === 500) {
+            alert("Server error, please try again later");
+        } else {
+            alert("An unexpected error occurred, please try again later");
+        }
+    });
 }
 </script>
 

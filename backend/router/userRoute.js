@@ -18,14 +18,26 @@ router.post('/register', async (req, res) => {
         const newUserId = await user.register(req.body);
 
         const token = jwt.sign({ userId: newUserId }, process.env.JWT_SECRET, { expiresIn:process.env.JWT_EXPIRATION });
-        res.cookie("token", token, { httpOnly: true, secure: true, sameSite: "strict" });
-
+        res.cookie("token", token, { httpOnly: true });
+        console.log(`Cookie created with token: ${token}, cookie: ${JSON.stringify(res.getHeader('Set-Cookie'))}`);
         res.status(201).json({ userId: newUserId, token });
     } catch (error) {
         console.error(`Error: ${error}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+
+//authentication middleware
+export function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if(!token) return res.sendStatus(401);
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+        if(err) return res.sendStatus(403);
+        req.user = user;
+        next();
+    });
+}
 
 // Login route
 router.post('/login', async (req, res) => {
@@ -55,6 +67,7 @@ router.post('/login', async (req, res) => {
 router.post('/logout', (req, res) => {
     try{
         res.clearCookie("token", { sameSite: "none", secure: true }).status(200).json("User logged out succesfully.");
+        console.log(`Cookie cleared: ${JSON.stringify(res.getHeader('Set-Cookie'))}`);
     }
     catch (error){
         console.error(`Error: ${error}`);
@@ -67,6 +80,7 @@ router.post('/logout', (req, res) => {
 router.put('/:id', async(req, res) => {
     try{
         const user = new User({ db: req.db });
+        console.log(req.body);
         const success = await user.update(req.params.id, req.body);
 
         if (!success) return res.status(404).json({ error: 'User not found' });

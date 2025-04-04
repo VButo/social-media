@@ -1,21 +1,44 @@
 <template>
     <div class="login">
         <h1>Login</h1>
-        <form>
-            <label for="username">username / email</label>
-            <input type="text" id="username" name="username" required autocomplete="email username">
+        <form @submit.prevent="login">
+            <label for="identifier">username / email</label>
+            <input v-model="identifier" type="text" id="identifier" name="identifier" required autocomplete="email username">
             <label for="password">password</label>
-            <input type="password" id="password" name="password" required autocomplete="current-password">
-            <button @click="login">Login</button>
+            <input v-model="password" type="password" id="password" name="password" required autocomplete="current-password">
+            <button>Login</button>
         </form>
         <RouterLink to="/register">Don't have an account? Register here</RouterLink>
     </div>
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import axios from 'axios'
+import { useRouter } from 'vue-router'
+
+const identifier = ref('')
+const password = ref('')
+const router = useRouter()
+const userId = ref('')
 
 const login = () => {
-    
+    axios.post('http://localhost:3000/api/users/login', {
+        identifier: identifier.value,
+        password: password.value
+    }).then(response => {
+        console.log(response.data)
+        if (response.data.token) {
+            userId.value = response.data.userId
+            localStorage.setItem('userId', response.data.userId)
+            router.push('/')
+        } else {
+            alert('Invalid credentials')
+        }
+    }).catch(error => {
+        console.error('There was an error!', error)
+        alert('Invalid credentials')
+    })
 }
 </script>
 

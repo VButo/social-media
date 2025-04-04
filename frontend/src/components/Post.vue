@@ -26,6 +26,7 @@ import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faComment } from '@fortawesome/free-regular-svg-icons';
 import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
 import { defineProps, ref, computed } from 'vue'
+import axios from 'axios';
 import { useRouter } from 'vue-router'
 
 const props = defineProps({
@@ -63,9 +64,14 @@ async function toggleLike() {
     liked.value = !liked.value
     const url = `http://localhost:3000/api/posts/${props.post.id}/${!liked.value?'un':''}like`;
 
-    const response = await fetch(url, {
+    const token = localStorage.getItem('token')
+    if (!token) {
+        console.error('You must be logged in to like a post');
+        return;
+    }
+    const response = await axios(url, {
         method: 'POST',
-        body: JSON.stringify({ userId: props.post.authorId })
+        data: JSON.stringify({ userId: props.post.authorId })
     })
     return response.json()
 }

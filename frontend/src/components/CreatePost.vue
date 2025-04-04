@@ -1,20 +1,34 @@
 <template>
     <div class=""></div>
     <div class="create-post">
-        <textarea name="new-post" class="new-post" placeholder="Write post here"></textarea>
+        <textarea name="new-post" class="new-post" placeholder="Write post here" v-model="postText"></textarea>
         <label for="file-upload" class="custom-file-upload">
             Upload image
         </label>
-        <input id="file-upload" type="file" accept="image/*"/>
+        <input id="file-upload" type="file" accept="image/png, image/jpeg, image/jpg"/>
         <button @click="post">Post</button>
     </div>
 </template>
 
 <script setup>
+import axios from 'axios'
+import { ref } from 'vue'
 
-    const post = () => {
-
+const postText = ref('')
+const postImage = ref(null)
+const postImageUrl = ref('')
+.post
+async function post() {
+    const postData = {
+        text: postText.value,
+        image: postImageUrl.value
     }
+
+    const result = await axios.post('http://localhost:3000/api/posts', postData, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+    })
+    console.log(result.data)
+}
 </script>
 
 

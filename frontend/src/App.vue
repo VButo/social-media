@@ -4,7 +4,7 @@
     <input type="text" id="search" placeholder="Search" v-model="search" @input="searchFunc" />
     <div id="nav-links">
       <RouterLink to="/" class="navLinks">Feed</RouterLink>
-      <RouterLink to="/profile/1" class="navLinks">Profile</RouterLink>
+      <RouterLink :to="{ name: 'profile', params: { id: userId } }"  class="navLinks">Profile</RouterLink>
       <RouterLink to="/login" class="navLinks">Login</RouterLink>
       <RouterLink to="/register" class="navLinks">Register</RouterLink>
       <button @click="logout" class="navLinks">Logout</button>
@@ -26,7 +26,7 @@ import { RouterLink, RouterView, useRouter } from 'vue-router'
 
 const search = ref('')
 const router = useRouter()
-
+const userId = ref(localStorage.getItem('userId'))
 watch(search, (newSearch) => {
   router.push({ path: '/users', query: { search: newSearch } });
 });

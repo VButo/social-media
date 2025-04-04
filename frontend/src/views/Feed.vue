@@ -1,6 +1,7 @@
 <template>
     <main>
       <div id="posts">
+            <h1 v-if="noPosts">No new posts found, add new friends to see their posts!</h1>
           <Post v-for="post in posts" :key="post.postId" :post="post"/>
       </div>
       <aside class="sidebar left-sidebar">
@@ -19,7 +20,7 @@
       </div>
   </template>
   
-  <script setup>
+<script setup>
   import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
   import { faUsersViewfinder } from '@fortawesome/free-solid-svg-icons';
   import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -27,6 +28,7 @@
   import Post from '../components/Post.vue'
   import { ref, onMounted } from 'vue'
   import Chat from '@/components/Chat.vue'
+  import axios from 'axios';
   
   const url = 'http://localhost:3000/api/'
   
@@ -45,33 +47,44 @@
   }
    */
   const posts = ref([])
+  const noPosts = ref(false)
+  const userId = localStorage.getItem('userId')
   
   async function getAllFollowingPosts(userId){
       try{
-          const response = await fetch(`${url}posts/${userId}/followedPosts`);
-          if (!response.ok) {
+          const response = await axios.get(`${url}posts/${userId}/followedPosts`, {headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}});
+          if (response.status !== 200) {
+              console.error('Error fetching posts:', response.statusText);
+                console.log(response);
               throw new Error('Network response was not ok');
           }
-          const data = await response.json();
+          else if(response.status === 200 && response.data.length === 0){
+            noPosts.value = true
+          }
+          else if(response.status === 200 && response.data.length > 0){
+              console.log('Posts found')
+          }
+          console.log(response)
+          const data = response.data;
           posts.value = data
           console.log(data)
       } catch(error) {
           console.error('There has been a problem with your fetch operation:', error);
       }
   }
-  
+
   onMounted(() => {
-      //fetchFollowers(3)
-      getAllFollowingPosts(1)
+    //fetchFollowers(3)
+    getAllFollowingPosts(userId)
   })
   
   const createPost = ref(false)
   const toggleCreatePost = () => {
       createPost.value = !createPost.value
   }
-  </script>
+</script>
   
-  <style scoped>
+<style scoped>
   #create-post-small-full-screen{
       display: none;
   }
@@ -165,5 +178,5 @@
           flex-direction: column;
       }
   }
-  </style>
+</style>
   

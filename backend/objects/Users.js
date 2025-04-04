@@ -11,12 +11,11 @@ class User {
 
     // CREATE A NEW USER(REGISTER)
     async register(data) {
-        const { username, password, email, fullName, bio, profilePicture } = data;
-        const sql = `INSERT INTO user (username, password, email, fullName,${bio ? ' bio,':''}
-        ${profilePicture?' profilePicture,':''} createdAt) VALUES (?, ?, ?, ?, ?${bio ? ', ?':''}${profilePicture ? ', ?':''})`;
+        const { username, password, email, fullName } = data;
+        const sql = `INSERT INTO user (username, password, email, fullName, profilePicture, createdAt) VALUES (?, ?, ?, ?, ?, ?)`;
         const hashedPassword = await argon2.hash(password);
         const time = new Date().toISOString().replace("T"," ").substring(0, 19);
-        let values = [username, hashedPassword, email, fullName, bio, profilePicture, time];
+        let values = [username, hashedPassword, email, fullName, '/images/profilePictures/default-user-image.jpg', time];
         values = values.filter(value => value !== undefined && value !== null);
         const result = await this.db.query(sql, values);
         return result[0].insertId;
@@ -57,9 +56,9 @@ class User {
         }
     }
     
-    //FIND ONE USER
+    //FIND ONE USER AND FOLLOWING USERS
     async findOne(id) {
-        const sql = 'SELECT * FROM user WHERE userId = ?';
+        const sql = 'SELECT * FROM user WHERE userId = ? ';
         const values = [id];
         const result = await this.db.query(sql, values);
         return result[0][0] || null;
@@ -78,7 +77,10 @@ class User {
         let updateFields = [username ? 'username = ?' : '', email ? 'email = ?' : '', fullName ? 'fullName = ?' : '', bio ? 'bio = ?' : '', profilePicture ? 'profilePicture = ?' : ''].filter(Boolean).join(', ');
         //Update only the fields that are provided and not null
         sql = `UPDATE user SET ${updateFields} WHERE userId = ?`;
-        values = [username, email, fullName, bio, profilePicture, userId];
+        const updatedProfilePicture = profilePicture 
+        ? 'images/profilePictures/' + profilePicture 
+        : null;
+        values = [username, email, fullName, bio, updatedProfilePicture, userId];
         // Remove undefined values from the array
         values = values.filter(value => value);
         result = await this.db.query(sql, values);
