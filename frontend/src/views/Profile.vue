@@ -24,7 +24,7 @@
 </template>
 
 <script setup>
-import { ref, defineProps, onMounted } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Post from '../components/Post.vue'
 import EditProfile from '@/components/EditProfile.vue'
@@ -36,56 +36,22 @@ const postExists = ref(false)
 
 const profile = ref({})
 const posts = ref([])
+const toggleEdit = ref(false);
 
-async function getUserProfile(userId) {
-    try {
-        const response = await axios.get(`http://localhost:3000/api/users/${userId}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-        if (response.status !== 200) {
-            throw new Error('Network response was not ok');
-        }
-        const data = response.data;
-        console.log(data)
-        
-        profile.value = data
-        console.log("profile image:" + profile.value.profilePicture)
-    } catch (error) {
-        console.error('There has been a problem with your fetch operation:', error);
-    }
-}
+const route = useRoute()
+const userId = route.params.id
 
-async function getUserPosts(userId) {
-    try {
-        const response = await axios.get(`http://localhost:3000/api/posts/${userId}`, {
-            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-        });
-        if (response.status !== 200) {
-            throw new Error('Network response was not ok');
-        }
-        const data = response.data;
-        console.log(data)
-        posts.value = data
-        postExist(posts.value)
-    } catch (error) {
-        console.error('There has been a problem with your fetch operation:', error);
-    }
-}
+onMounted(async () => {
+  try {
+    const profileResponse = await axios.get(`http://localhost:3000/api/users/${userId}`, { withCredentials: true });
+    profile.value = profileResponse.data;
 
-const postExist = (posts) => {
-    if (posts.length > 0) {
-        return true
-    } else {
-        return false
-    }
-}
-
-onMounted(() => {
-    const route = useRoute()
-    const userId = route.params.id
-    getUserProfile(userId)
-    getUserPosts(userId)
-})
+    const postsResponse = await axios.get(`http://localhost:3000/api/posts/${userId}`, { withCredentials: true });
+    posts.value = postsResponse.data;
+  } catch (error) {
+    console.error('Error fetching profile or posts:', error);
+  }
+});
 
 const handleEditProfile = (editedProfile) => {
     profile.value = editedProfile.value
@@ -95,7 +61,6 @@ const handleEditProfile = (editedProfile) => {
 const handleClose = () => {
     toggleEdit.value = false
 }
-const toggleEdit = ref(false);
 
 </script>
 

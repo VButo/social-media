@@ -15,7 +15,7 @@ class User {
         const sql = `INSERT INTO user (username, password, email, fullName, profilePicture, createdAt) VALUES (?, ?, ?, ?, ?, ?)`;
         const hashedPassword = await argon2.hash(password);
         const time = new Date().toISOString().replace("T"," ").substring(0, 19);
-        let values = [username, hashedPassword, email, fullName, '/images/profilePictures/default-user-image.jpg', time];
+        let values = [username, hashedPassword, email, fullName, process.env.DEFAULT_PROFILE_PICTURE, time];
         values = values.filter(value => value !== undefined && value !== null);
         const result = await this.db.query(sql, values);
         return result[0].insertId;

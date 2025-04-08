@@ -3,6 +3,7 @@ import connectDB from './database/db.js';
 import userRouter from './router/userRoute.js';
 import postRouter from './router/postRoute.js';
 import commentRouter from './router/commentRoute.js';
+import cookieParser from 'cookie-parser';
 import { authenticateToken } from './router/userRoute.js';
 import cors from 'cors';
 
@@ -10,8 +11,14 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const db_connection = await connectDB(); 
 
-app.use(cors());
+
+app.use(cors({
+    origin: 'http://localhost:5173',
+    credentials: true
+  }));
+//app.use(cors());
 //app.options('*', cors());
+app.use(cookieParser());
 app.use(express.json());
 
 // Middleware to add the DB connection to request object

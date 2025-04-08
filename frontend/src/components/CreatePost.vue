@@ -15,9 +15,9 @@ import axios from 'axios'
 import { ref } from 'vue'
 
 const postText = ref('')
-const postImage = ref(null)
+const postImage = ref('')
 const postImageUrl = ref('')
-.post
+
 async function post() {
     const postData = {
         text: postText.value,

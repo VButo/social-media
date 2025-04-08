@@ -43,9 +43,7 @@ async function saveEdit() {
         bio: bio.value
     })
     console.log('edited: '+ editedProfile.value)
-    const response = await axios.put(`http://localhost:3000/api/users/${props.profile.userId}`, editedProfile.value, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    })
+    const response = await axios.put(`http://localhost:3000/api/users/${props.profile.userId}`, editedProfile.value, {withCredentials: true})
     console.log(response.data)
     if (response.status !== 200) {
         throw new Error('Network response was not ok');

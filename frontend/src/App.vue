@@ -4,7 +4,7 @@
     <input type="text" id="search" placeholder="Search" v-model="search" @input="searchFunc" />
     <div id="nav-links">
       <RouterLink to="/" class="navLinks">Feed</RouterLink>
-      <RouterLink :to="{ name: 'profile', params: { id: userId } }"  class="navLinks">Profile</RouterLink>
+      <RouterLink :to="{ name: 'profile', params: { id: userId}}" class="navLinks">Profile</RouterLink>
       <RouterLink to="/login" class="navLinks">Login</RouterLink>
       <RouterLink to="/register" class="navLinks">Register</RouterLink>
       <button @click="logout" class="navLinks">Logout</button>
@@ -21,21 +21,37 @@
 import { ref, watch } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
+import axios from 'axios'
 
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 
 const search = ref('')
 const router = useRouter()
-const userId = ref(localStorage.getItem('userId'))
+const userId = ref()
+if (localStorage.getItem('userId') === null) {
+  router.push('/login')
+} else {
+  userId = localStorage.getItem('userId')
+}
+
 watch(search, (newSearch) => {
   router.push({ path: '/users', query: { search: newSearch } });
 });
 
 const logout = () => {
+  localStorage.removeItem('userId')
+  axios.post('http://localhost:3000/api/logout', {}, { withCredentials: true })
+    .then(() => {
+      console.log('Logged out successfully')
+    })
+    .catch((error) => {
+      console.error('Error logging out:', error)
+    })
+  router.push('/login')
 }
 
 const routeHome = () => {
-  
+  router.push('/')
 }
 
 const navBar = ref(false)

@@ -48,35 +48,21 @@
    */
   const posts = ref([])
   const noPosts = ref(false)
-  const userId = localStorage.getItem('userId')
+  const userId = ref(localStorage.getItem('userId'))
   
-  async function getAllFollowingPosts(userId){
-      try{
-          const response = await axios.get(`${url}posts/${userId}/followedPosts`, {headers: {Authorization: `Bearer ${localStorage.getItem('token')}`}});
-          if (response.status !== 200) {
-              console.error('Error fetching posts:', response.statusText);
-                console.log(response);
-              throw new Error('Network response was not ok');
-          }
-          else if(response.status === 200 && response.data.length === 0){
-            noPosts.value = true
-          }
-          else if(response.status === 200 && response.data.length > 0){
-              console.log('Posts found')
-          }
-          console.log(response)
-          const data = response.data;
-          posts.value = data
-          console.log(data)
-      } catch(error) {
-          console.error('There has been a problem with your fetch operation:', error);
-      }
+  onMounted(async () => {
+  try {
+    const followingResponse = await axios.get(`http://localhost:3000/api/users/${userId}/following`, { withCredentials: true });
+    if (followingResponse.data.length === 0) {
+      noPosts.value = true;
+    } else {
+      const postsResponse = await axios.get(`http://localhost:3000/api/posts/${userId}/followedPosts`, { withCredentials: true });
+      posts.value = postsResponse.data;
+    }
+  } catch (error) {
+    console.error('Error fetching posts or following users:', error);
   }
-
-  onMounted(() => {
-    //fetchFollowers(3)
-    getAllFollowingPosts(userId)
-  })
+});
   
   const createPost = ref(false)
   const toggleCreatePost = () => {

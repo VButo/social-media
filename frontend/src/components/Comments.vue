@@ -2,13 +2,10 @@
     <div class="comments">
         <Comment v-for="comment in comments" :key="comment.id" :comment="comment"/>
     </div>
-    <!--<textarea name="new-comment" id="new-comment" placeholder="Write your comment here"></textarea>
-    <button>Comment</button>-->
     <CommentResponse />
 </template>
 
 <script setup>
-import { ref } from 'vue'
 import CommentResponse from './CommentResponse.vue';
 import Comment from './Comment.vue';
 import { defineProps } from 'vue';

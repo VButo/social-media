@@ -1,9 +1,33 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
+dotenv.config();
+import cookieParser from 'cookie-parser';
 
 import User from '../objects/Users.js'; // Adjust the path as necessary
 
 const router = express.Router();
+
+
+export function authenticateToken(req, res, next) {
+    const token = req.cookies.token; // Token from cookie
+    console.log('Token:', token); // Debugging
+  
+    if (!token) return res.sendStatus(401); // Unauthorized
+  
+    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+      if (err) return res.sendStatus(403); // Forbidden
+  
+      req.user = user;
+      next();
+    });
+}
+
+// Validation route
+router.get('/validate', authenticateToken, (req, res) => {
+    console.log(`User validated: ${req.user.userId}`);
+    res.status(200).json({ userId: req.user.userId });
+});
 
 // Register route
 router.post('/register', async (req, res) => {
@@ -17,27 +41,16 @@ router.post('/register', async (req, res) => {
 
         const newUserId = await user.register(req.body);
 
-        const token = jwt.sign({ userId: newUserId }, process.env.JWT_SECRET, { expiresIn:process.env.JWT_EXPIRATION });
-        res.cookie("token", token, { httpOnly: true });
-        console.log(`Cookie created with token: ${token}, cookie: ${JSON.stringify(res.getHeader('Set-Cookie'))}`);
-        res.status(201).json({ userId: newUserId, token });
+        const token = createToken(newUserId);
+        res.cookie('token', token, {
+            httpOnly: true,
+            sameSite: "lax"
+        }).status(200).json({userId: loggedInUser.userId, token: token});
     } catch (error) {
         console.error(`Error: ${error}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
-
-//authentication middleware
-export function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
-    if(!token) return res.sendStatus(401);
-    jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-        if(err) return res.sendStatus(403);
-        req.user = user;
-        next();
-    });
-}
 
 // Login route
 router.post('/login', async (req, res) => {
@@ -51,30 +64,30 @@ router.post('/login', async (req, res) => {
         if (!loggedInUser) {
             return res.status(401).json({ error: 'Invalid credentials' });
         }
-        const token = jwt.sign({ userId: loggedInUser.userId }, process.env.JWT_SECRET, { expiresIn:process.env.JWT_EXPIRATION });
-        res.cookie("token", token, {
+        const token = createToken(loggedInUser.userId);
+        console.log(res.cookie('token', token, {
             httpOnly: true,
-            secure: true,
-            sameSite: "strict",
-        }).status(200).json({userId: loggedInUser.userId, token: token});
+            sameSite: "lax"
+        }).status(200).json({userId: loggedInUser.userId, token: token}));
+
     } catch (error) {
         console.error(`Error: ${error}`);
         res.status(500).json({ error: 'Internal server error' });
     }
 });
 
-// Logout route
+//Logout route
 router.post('/logout', (req, res) => {
-    try{
-        res.clearCookie("token", { sameSite: "none", secure: true }).status(200).json("User logged out succesfully.");
-        console.log(`Cookie cleared: ${JSON.stringify(res.getHeader('Set-Cookie'))}`);
-    }
-    catch (error){
-        console.error(`Error: ${error}`);
-        res.status(500).json({ error: 'Internal server error' });
-
-    }
+    res.clearCookie('token', {
+        httpOnly: true,
+        sameSite: 'lax',
+    });
+    res.status(200).json({ message: 'Logged out and cookie deleted' });
 });
+
+function createToken(userId) {
+    return jwt.sign({ userId: userId }, process.env.JWT_SECRET, { expiresIn: process.env.JWT_EXPIRATION });
+}
 
 // Update route
 router.put('/:id', async(req, res) => {

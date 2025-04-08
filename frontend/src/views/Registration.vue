@@ -64,7 +64,7 @@ const register = () => {
         password: password.value,
         email: email.value,
         fullName: fullName.value
-    }).then(res => console.log(res.data)).catch(err => {
+    }, {withCredentials: true}).then(res => console.log(res.data)).catch(err => {
         console.log(err.response.data);
         if (err.response.status === 400) {
             alert("Username or email already exists");

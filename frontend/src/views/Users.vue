@@ -7,7 +7,7 @@
 
 <script setup>
 import User from '@/components/User.vue';
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, withCtx } from 'vue'
 import { useRoute } from 'vue-router'
 
 const users = ref([
@@ -18,6 +18,15 @@ const users = ref([
 
 const route = useRoute()
 
+onMounted(async () => {
+    try {
+        const response = await axios.get('http://localhost:3000/api/users', { withCtredentials: true });
+        users.value = response.data;
+    } catch (error) {
+        console.error('Error fetching users:', error);
+    }
+})
+
 const filteredUsers = computed(() => {
     const searchQuery = route.query.search?.toLowerCase() || "";
     return users.value.filter(user => 
@@ -25,7 +34,6 @@ const filteredUsers = computed(() => {
         user.uname.toLowerCase().includes(searchQuery)
     );
 });
-
 </script>
 
 <style scoped>

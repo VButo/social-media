@@ -26,7 +26,7 @@ const login = () => {
     axios.post('http://localhost:3000/api/users/login', {
         identifier: identifier.value,
         password: password.value
-    }).then(response => {
+    }, {withCredentials: true}).then(response => {
         console.log(response.data)
         if (response.data.token) {
             userId.value = response.data.userId
