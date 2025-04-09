@@ -16,30 +16,31 @@
 import { ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '../stores/auth'
 
+const authStore = useAuthStore()
 const identifier = ref('')
 const password = ref('')
 const router = useRouter()
-const userId = ref('')
 
-const login = () => {
-    axios.post('http://localhost:3000/api/users/login', {
-        identifier: identifier.value,
-        password: password.value
-    }, {withCredentials: true}).then(response => {
-        console.log(response.data)
-        if (response.data.token) {
-            userId.value = response.data.userId
-            localStorage.setItem('userId', response.data.userId)
-            router.push('/')
-        } else {
-            alert('Invalid credentials')
-        }
-    }).catch(error => {
-        console.error('There was an error!', error)
-        alert('Invalid credentials')
-    })
-}
+const login = async () => {
+  try {
+    const response = await axios.post('http://localhost:3000/api/users/login', {
+      identifier: identifier.value,
+      password: password.value,
+    }, { withCredentials: true });
+
+    // Set userId and isAuthenticated in the auth store
+    authStore.userId = response.data.userId;
+    authStore.isAuthenticated = true;
+
+    // Redirect to the feed
+    router.push('/');
+  } catch (error) {
+    console.error('There was an error!', error);
+    alert('Invalid credentials');
+  }
+};
 </script>
 
 <style scoped>

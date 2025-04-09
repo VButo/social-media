@@ -25,7 +25,9 @@ export function authenticateToken(req, res, next) {
 
 // Validation route
 router.get('/validate', authenticateToken, (req, res) => {
-    console.log(`User validated: ${req.user.userId}`);
+    if (!req.user || !req.user.userId) {
+      return res.status(401).json({ error: 'Unauthorized' });
+    }
     res.status(200).json({ userId: req.user.userId });
 });
 
@@ -55,24 +57,23 @@ router.post('/register', async (req, res) => {
 // Login route
 router.post('/login', async (req, res) => {
     try {
-        const { identifier, password } = req.body;
-
-        const user = new User({ db: req.db });
-
-        const loggedInUser = await user.login(identifier, password);
-
-        if (!loggedInUser) {
-            return res.status(401).json({ error: 'Invalid credentials' });
-        }
-        const token = createToken(loggedInUser.userId);
-        console.log(res.cookie('token', token, {
-            httpOnly: true,
-            sameSite: "lax"
-        }).status(200).json({userId: loggedInUser.userId, token: token}));
-
+      const { identifier, password } = req.body;
+  
+      const user = new User({ db: req.db });
+      const loggedInUser = await user.login(identifier, password);
+  
+      if (!loggedInUser) {
+        return res.status(401).json({ error: 'Invalid credentials' });
+      }
+  
+      const token = createToken(loggedInUser.userId);
+      res.cookie('token', token, {
+        httpOnly: true,
+        sameSite: 'lax',
+      }).status(200).json({ userId: loggedInUser.userId });
     } catch (error) {
-        console.error(`Error: ${error}`);
-        res.status(500).json({ error: 'Internal server error' });
+      console.error(`Error: ${error}`);
+      res.status(500).json({ error: 'Internal server error' });
     }
 });
 

@@ -3,11 +3,17 @@
     <h1 id="logo" @click="routeHome">Social media</h1>
     <input type="text" id="search" placeholder="Search" v-model="search" @input="searchFunc" />
     <div id="nav-links">
-      <RouterLink to="/" class="navLinks">Feed</RouterLink>
-      <RouterLink :to="{ name: 'profile', params: { id: userId}}" class="navLinks">Profile</RouterLink>
-      <RouterLink to="/login" class="navLinks">Login</RouterLink>
-      <RouterLink to="/register" class="navLinks">Register</RouterLink>
-      <button @click="logout" class="navLinks">Logout</button>
+      <div v-if="authStore.isAuthenticated">
+        <RouterLink to="/" class="navLinks">Feed</RouterLink>
+        <RouterLink :to="{ name: 'profile', params: { id: authStore.userId}}" class="navLinks">Profile</RouterLink>
+      </div>
+      <div v-else>
+        <RouterLink to="/login" class="navLinks">Login</RouterLink>
+        <RouterLink to="/register" class="navLinks">Register</RouterLink>
+      </div>
+      <div v-if="authStore.isAuthenticated">
+        <button @click="logout" class="navLinks">Logout</button>
+      </div>
       <a @click="navToggle" class="icon"><FontAwesomeIcon :icon="faBars"/></a>
     </div>
   </nav>
@@ -18,28 +24,35 @@
 
 
 <script setup>
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
+import { useAuthStore } from './stores/auth'
 
 import { RouterLink, RouterView, useRouter } from 'vue-router'
 
+const authStore = useAuthStore()
 const search = ref('')
 const router = useRouter()
-const userId = ref()
-if (localStorage.getItem('userId') === null) {
-  router.push('/login')
-} else {
-  userId = localStorage.getItem('userId')
-}
 
 watch(search, (newSearch) => {
   router.push({ path: '/users', query: { search: newSearch } });
 });
 
+onMounted(async () => {
+  if (document.cookie.includes('token')) {
+    await authStore.fetchUser();
+    if (!authStore.isAuthenticated) {
+      router.push('/login');
+    }
+  }
+});
+
+
 const logout = () => {
-  localStorage.removeItem('userId')
+  authStore.isAuthenticated = false
+  authStore.userId = null
   axios.post('http://localhost:3000/api/logout', {}, { withCredentials: true })
     .then(() => {
       console.log('Logged out successfully')

@@ -1,22 +1,48 @@
 import e from "express";
+import fs from "fs";
 import multer from "multer";
 import path from "path";
-
 import Post from "../objects/Posts.js";
 const router = e.Router();
 
+const upload = multer({
+    dest: "public/images/postImages",
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+});
 
-const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, path.join(__dirname, "public/images/postImages"));
-    },
-    filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      cb(null, file.fieldname + "-" + uniqueSuffix + path.extname(file.originalname));
+//CREATE A POST
+router.post("/:userId", upload.single('image'), async(req, res) => {
+    const { text } = req.body;
+    const file = req.file;
+    const userId = req.params.userId;
+
+    const post = new Post({ db: req.db });
+    try{
+        let imageUrl = null;
+
+        if (file) {
+            const targetPath = path.join("public", "images", "postImages", file.originalname);
+      
+            // Rename the file to move it to the permanent location
+            fs.renameSync(file.path, targetPath);
+      
+            // Set the image URL
+            imageUrl = `/images/postImages/${file.originalname}`;
+        }
+        
+        const newPost = await post.createPost({ caption: text, image: imageUrl, userId });
+
+        
+        if (!newPost) {
+            return res.status(404).json({ error: "Couldn't create the post" });
+          }
+      
+          res.status(200).json({ message: "Post created successfully!", post: newPost });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        res.status(500).json({ error: "Internal server error" });
     }
-  });
-
-  const upload = multer({ storage: storage, limits: { fileSize: 500 * 1024 } }).single("image");
+});
 
 //GET ALL POSTS FROM A USER
 router.get("/:userId", async (req, res) => {
@@ -40,21 +66,6 @@ router.get('/:postId/post', async (req, res) => {
         const userPosts = await post.getPost(postId);
         if (!userPosts) return res.status(404).json({ error: "Post not found" });
         res.status(200).json(userPosts);
-    } catch (error) {
-        console.error(`Error: ${error}`);
-        res.status(500).json({ error: 'Internal server error' });
-    }
-});
-
-//CREATE A POST
-router.post("/:userId", async(req, res) => {
-    const createPost = req.body;
-    createPost.userId = req.params.userId;
-    const post = new Post({ db: req.db });
-    try{
-        const newPost = await post.createPost(createPost);
-        if (!newPost) return res.status(404).json({ error: "Couldn't create the post" });
-        res.status(200).json('Post created successfully!');
     } catch (error) {
         console.error(`Error: ${error}`);
         res.status(500).json({ error: 'Internal server error' });

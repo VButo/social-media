@@ -5,29 +5,46 @@
         <label for="file-upload" class="custom-file-upload">
             Upload image
         </label>
-        <input id="file-upload" type="file" accept="image/png, image/jpeg, image/jpg"/>
+        <input id="file-upload" type="file" accept="image/png, image/jpeg, image/jpg" @change="handleFileUpload"/>
         <button @click="post">Post</button>
     </div>
 </template>
+
 
 <script setup>
 import axios from 'axios'
 import { ref } from 'vue'
 
 const postText = ref('')
-const postImage = ref('')
-const postImageUrl = ref('')
+const postImage = ref(null)
 
 async function post() {
-    const postData = {
-        text: postText.value,
-        image: postImageUrl.value
-    }
+    const formData = new FormData();
+    formData.append('text', postText.value);
 
-    const result = await axios.post('http://localhost:3000/api/posts', postData, {
-        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
-    })
-    console.log(result.data)
+    if(postImage.value) {
+        formData.append('image', postImage.value);
+    }
+    try{
+        const result = await axios.post('http://localhost:3000/api/posts', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        },
+        withCredentials: true
+        });
+        console.log(result.data);  
+    } catch(error) {
+        console.error('There was an error while uploading the post!', error)
+    }
+}
+
+function handleFileUpload(event) {
+    const file = event.target.files[0];
+    if (file && (file.type === 'image/png' || file.type === 'image/jpeg' || file.type === 'image/jpg')) {
+        postImage.value = file;
+    } else {
+        alert('Please upload a valid image file (PNG, JPEG, JPG)');
+    }
 }
 </script>
 

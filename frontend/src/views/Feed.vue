@@ -27,37 +27,31 @@
   import CreatePost from '@/components/CreatePost.vue'
   import Post from '../components/Post.vue'
   import { ref, onMounted } from 'vue'
+  import { useAuthStore } from '@/stores/auth.js'
   import Chat from '@/components/Chat.vue'
   import axios from 'axios';
   
   const url = 'http://localhost:3000/api/'
-  
-  /*
-  async function fetchFollowers(userId){
-      try{
-          const response = await fetch(`${url}users/${userId}/followers`);
-          if (!response.ok) {
-              throw new Error('Network response was not ok');
-          }
-          const data = await response.json();
-          console.log(data)
-      } catch(error) {
-          console.error('There has been a problem with your fetch operation:', error);
-      }
-  }
-   */
+  const authStore = useAuthStore()
   const posts = ref([])
   const noPosts = ref(false)
-  const userId = ref(localStorage.getItem('userId'))
   
   onMounted(async () => {
   try {
-    const followingResponse = await axios.get(`http://localhost:3000/api/users/${userId}/following`, { withCredentials: true });
-    if (followingResponse.data.length === 0) {
-      noPosts.value = true;
+    if (!authStore.userId) {
+      await authStore.fetchUser();
+    }
+
+    if (authStore.userId) {
+      const followingResponse = await axios.get(`http://localhost:3000/api/users/${authStore.userId}/following`, { withCredentials: true });
+      if (followingResponse.data.length === 0) {
+        noPosts.value = true;
+      } else {
+        const postsResponse = await axios.get(`http://localhost:3000/api/posts/${authStore.userId}/followedPosts`, { withCredentials: true });
+        posts.value = postsResponse.data;
+      }
     } else {
-      const postsResponse = await axios.get(`http://localhost:3000/api/posts/${userId}/followedPosts`, { withCredentials: true });
-      posts.value = postsResponse.data;
+      console.error('User is not authenticated');
     }
   } catch (error) {
     console.error('Error fetching posts or following users:', error);
