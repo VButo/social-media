@@ -1,5 +1,4 @@
 <template>
-    <div class=""></div>
     <div class="create-post">
         <textarea name="new-post" class="new-post" placeholder="Write post here" v-model="postText"></textarea>
         <label for="file-upload" class="custom-file-upload">
@@ -13,8 +12,10 @@
 
 <script setup>
 import axios from 'axios'
+import { useAuthStore } from '@/stores/auth.js'
 import { ref } from 'vue'
 
+const authStore = useAuthStore()
 const postText = ref('')
 const postImage = ref(null)
 
@@ -26,7 +27,7 @@ async function post() {
         formData.append('image', postImage.value);
     }
     try{
-        const result = await axios.post('http://localhost:3000/api/posts', formData, {
+        const result = await axios.post(`http://localhost:3000/api/posts/${authStore.userId}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
         },

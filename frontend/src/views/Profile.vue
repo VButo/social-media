@@ -3,9 +3,12 @@
         <div id="profile">
             <div class="profile-header">
                 <img :src="`http://localhost:5173/${profile.profilePicture}`" alt="Profile picture">
-                <div>
+                <div v-if="profile.userId === authStore.userId">
                     <button @click="toggleEdit = !toggleEdit">Edit profile</button>
                     <button>Logout</button>
+                </div>
+                <div v-else>
+                    <button>Follow</button>
                 </div>
             </div>
             <hr>
@@ -28,10 +31,11 @@ import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import Post from '../components/Post.vue'
 import EditProfile from '@/components/EditProfile.vue'
+import { useAuthStore } from '@/stores/auth.js'
 import axios from 'axios'
 
 window.scrollTo(0, 0)
-
+const authStore = useAuthStore()
 const postExists = ref(false)
 
 const profile = ref({})
@@ -48,6 +52,7 @@ onMounted(async () => {
 
     const postsResponse = await axios.get(`http://localhost:3000/api/posts/${userId}`, { withCredentials: true });
     posts.value = postsResponse.data;
+    console.log('posts', posts.value)
   } catch (error) {
     console.error('Error fetching profile or posts:', error);
   }
@@ -84,6 +89,8 @@ main{
 img{
     width: 200px;
     height: 200px;
+    object-fit: cover;
+    border: 5px solid #333;
     border-radius: 50%;
     margin: 20px;
 }

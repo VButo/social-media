@@ -1,8 +1,12 @@
 import e from "express";
 import fs from "fs";
+import { fileURLToPath } from "url";
 import multer from "multer";
 import path from "path";
 import Post from "../objects/Posts.js";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 const router = e.Router();
 
 const upload = multer({
@@ -21,13 +25,17 @@ router.post("/:userId", upload.single('image'), async(req, res) => {
         let imageUrl = null;
 
         if (file) {
-            const targetPath = path.join("public", "images", "postImages", file.originalname);
+            const targetPath = path.join(
+                __dirname,
+                "../../frontend/public/images/postImages",
+                file.originalname
+              );
       
             // Rename the file to move it to the permanent location
-            fs.renameSync(file.path, targetPath);
+            await fs.promises.rename(file.path, targetPath);
       
             // Set the image URL
-            imageUrl = `/images/postImages/${file.originalname}`;
+            imageUrl = `images/postImages/${file.originalname}`;
         }
         
         const newPost = await post.createPost({ caption: text, image: imageUrl, userId });
@@ -37,7 +45,7 @@ router.post("/:userId", upload.single('image'), async(req, res) => {
             return res.status(404).json({ error: "Couldn't create the post" });
           }
       
-          res.status(200).json({ message: "Post created successfully!", post: newPost });
+          res.status(200).json({ message: "Post created successfully!", post: newPost.value });
     } catch (error) {
         console.error(`Error: ${error}`);
         res.status(500).json({ error: "Internal server error" });

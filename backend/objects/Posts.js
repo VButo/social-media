@@ -37,7 +37,7 @@ class Post {
 
   //CREATE A POST
   async createPost(post) {
-    const sql = `INSERT INTO post (userId, ${post.caption ? 'caption, ':''}${post.image?'image, ':''}createdAt) VALUES (?,${post.caption ? '?, ':''}${post.image?'?, ':''} NOW())`;
+    const sql = `INSERT INTO post (userId, caption, ${post.image?'image, ':''}createdAt) VALUES (?,?,${post.image?'?, ':''} NOW())`;
     console.log(post + ' '+sql);
     let values = [post.userId, post.caption, post.image];
     values = values.filter((value) => value); // Remove undefined values
@@ -58,6 +58,7 @@ class Post {
     const sql = "INSERT INTO `like` (userId, postId, createdAt) VALUES (?, ?, NOW());";
     const values = [data.userId, data.postId];
     const result = await this.db.query(sql, values);
+    console.log('result is: ', result[0]);
     return result[0];
   }
 
@@ -84,7 +85,7 @@ class Post {
                  JOIN user u ON p.userId = u.userId
                  LEFT JOIN \`like\` l ON p.postId = l.postId
                  LEFT JOIN comment c ON p.postId = c.postId
-                 WHERE p.userId IN (SELECT followingUserId FROM follow WHERE followerUserId = ?)
+                 WHERE p.userId IN (SELECT followerUserId FROM follow WHERE followingUserId = ?)
                  GROUP BY p.postId
                  ORDER BY p.createdAt DESC;`;
     const values = [userId];

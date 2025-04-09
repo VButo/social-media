@@ -2,7 +2,7 @@
     <main>
       <div id="posts">
             <h1 v-if="noPosts">No new posts found, add new friends to see their posts!</h1>
-          <Post v-for="post in posts" :key="post.postId" :post="post"/>
+          <Post v-for="post in authStore.feedPosts" :key="post.postId" :post="post"/>
       </div>
       <aside class="sidebar left-sidebar">
           <CreatePost/>
@@ -29,11 +29,8 @@
   import { ref, onMounted } from 'vue'
   import { useAuthStore } from '@/stores/auth.js'
   import Chat from '@/components/Chat.vue'
-  import axios from 'axios';
-  
-  const url = 'http://localhost:3000/api/'
+
   const authStore = useAuthStore()
-  const posts = ref([])
   const noPosts = ref(false)
   
   onMounted(async () => {
@@ -43,12 +40,13 @@
     }
 
     if (authStore.userId) {
-      const followingResponse = await axios.get(`http://localhost:3000/api/users/${authStore.userId}/following`, { withCredentials: true });
-      if (followingResponse.data.length === 0) {
+      authStore.getFollowingUsers();
+      console.log('followingUsers', authStore.followingUsers);
+      if (authStore.followingUsers === 0) {
         noPosts.value = true;
       } else {
-        const postsResponse = await axios.get(`http://localhost:3000/api/posts/${authStore.userId}/followedPosts`, { withCredentials: true });
-        posts.value = postsResponse.data;
+        await authStore.getFeedPosts();
+        console.log('feedPosts', authStore.feedPosts);
       }
     } else {
       console.error('User is not authenticated');

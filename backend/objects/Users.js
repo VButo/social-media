@@ -1,13 +1,9 @@
-// login register, login, logout, user info, follow, unfollow, get followers, get following, get user by id, get user by username, update user info, delete user
+// register, login, logout, user info, follow, unfollow, get followers, get following, get user by id, get user by username, update user info, delete user
 import argon2 from 'argon2';
 class User {
     constructor(config) {
         this.db = config.db;
     }
-
-//${bio ? 'bio,':''}${profilePicture?'profilePicture':''}
-//${bio ? ', ?':''}${profilePicture ? ', ?':''}
-//, bio, profilePicture
 
     // CREATE A NEW USER(REGISTER)
     async register(data) {
@@ -46,7 +42,7 @@ class User {
     //FIND ALL USERS
     async findAll() {
         try {
-            const sql = 'SELECT * FROM user';
+            const sql = 'SELECT * FROM user WHERE username LIKE ? OR fullName LIKE ? LIMIT 20';
             const values = [];
             const result = await this.db.query(sql, values);
             return result[0];
@@ -54,6 +50,15 @@ class User {
             console.error(`Error: ${error}`);
             throw error;
         }
+    }
+    async searchUsers(searchQuery) {
+        const sql = `
+            SELECT * FROM user
+            WHERE username LIKE ? OR fullName LIKE ?
+        `;
+        const values = [`%${searchQuery}%`, `%${searchQuery}%`];
+        const result = await this.db.query(sql, values);
+        return result[0];
     }
     
     //FIND ONE USER AND FOLLOWING USERS
@@ -129,6 +134,13 @@ class User {
             console.error(`Error while unfollowing user: ${error}`);
             throw error;
         }
+    }
+
+    async isFollowing(userId, targetUserId) {
+        const sql = 'SELECT * FROM follow WHERE followerUserId = ? AND followingUserId = ?';
+        const values = [targetUserId, userId];
+        const result = await this.db.query(sql, values);
+        return result[0].length > 0;
     }
 
     //GET FOLLOWERS

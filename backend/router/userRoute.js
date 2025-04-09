@@ -16,7 +16,7 @@ export function authenticateToken(req, res, next) {
     if (!token) return res.sendStatus(401); // Unauthorized
   
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) return res.sendStatus(403); // Forbidden
+      if (err) return res.sendStatus(403); 
   
       req.user = user;
       next();
@@ -175,12 +175,27 @@ router.get('/:id/following', async (req, res) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 });
+//check if user is following another user
+router.get('/:targetUserId/isFollowing', async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const user = new User({ db: req.db });
+        const isFollowing = await user.isFollowing(req.params.targetUserId, userId);
+        if (!isFollowing) return res.status(404).json({ error: 'User not found' });
+        res.status(200).json(isFollowing);
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 // Get all users route
 router.get('/', async (req, res) => {
     try {
+        const searchQuery = req.query.search || '';
         const user = new User({ db: req.db });
-        const users = await user.findAll();
+
+        const users = await user.searchUsers(searchQuery);
         res.status(200).json(users);
     } catch (error) {
         console.error(`Error: ${error}`);

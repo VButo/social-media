@@ -1,13 +1,13 @@
 <template>
     <div class="post">
         <div id="user-info" @click="visitProfile">
-            <img :src="post.profilePicture" id="profile-picture">
+            <img :src="`http://localhost:5173/${post.profilePicture}`" id="profile-picture">
             <div id="user-data">
                 <p style="font-weight: bold;" id="u-name">{{ post.username }}</p>
                 <p>{{ post.caption }}</p>
             </div>
         </div>
-        <img :src="post.image" alt="Post image" v-on:dblclick="toggleLike">
+        <img v-if="post.image" :src="`http://localhost:5173/${post.image}`" alt="Post image" v-on:dblclick="toggleLike">
         <div>
             <button v-if="!liked" @click="toggleLike"><FontAwesomeIcon :icon="faHeart"/> {{ formattedLikes }}</button>
             <button v-else @click="toggleLike" style="color: red;"><FontAwesomeIcon :icon="faHeartSolid"/> {{ formattedLikes }}</button>
@@ -28,6 +28,9 @@ import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
 import { defineProps, ref, computed } from 'vue'
 import axios from 'axios';
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth.js'
+
+const authStore = useAuthStore()
 
 const props = defineProps({
     post: {
@@ -61,19 +64,23 @@ const formattedLikes = computed(() => {
 });
 
 async function toggleLike() {
-    liked.value = !liked.value
-    const url = `http://localhost:3000/api/posts/${props.post.id}/${!liked.value?'un':''}like`;
+    liked.value = !liked.value;
 
-    const token = localStorage.getItem('token')
-    if (!token) {
+    const url = `http://localhost:3000/api/posts/${props.post.postId}/${!liked.value ? 'un' : ''}like`;
+
+    await authStore.fetchUser();
+
+    if (!authStore.isAuthenticated) {
         console.error('You must be logged in to like a post');
         return;
     }
-    const response = await axios(url, {
-        method: 'POST',
-        data: JSON.stringify({ userId: props.post.authorId })
-    })
-    return response.json()
+
+    try {
+        const response = await axios.post(url, { userId: authStore.userId }, { withCredentials: true });
+        console.log(response.data);
+    } catch (error) {
+        console.error('Error toggling like:', error);
+    }
 }
 const toggleComments = () => {
 
@@ -97,7 +104,7 @@ const visitProfile = () => {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
-    width: 100%;
+    width: 50%;
 }
 
 

@@ -52,7 +52,7 @@ onMounted(async () => {
 const logout = () => {
   authStore.isAuthenticated = false
   authStore.userId = null
-  axios.post('http://localhost:3000/api/logout', {}, { withCredentials: true })
+  axios.post('http://localhost:3000/api/users/logout', {}, { withCredentials: true })
     .then(() => {
       console.log('Logged out successfully')
     })
