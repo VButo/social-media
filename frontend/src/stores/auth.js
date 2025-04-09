@@ -9,6 +9,15 @@ export const useAuthStore = defineStore('auth', {
     followingUsers: null,
   }),
   actions: {
+    async checkIfLiked(postId) {
+      try {
+        const response = await axios.get(`http://localhost:3000/api/posts/${postId}/likes`, { withCredentials: true });
+        return response.data.some((like) => like.userId === this.userId);
+      } catch (error) {
+        console.error('Error fetching likes:', error);
+        throw error;
+      }
+    },
     async fetchUser() {
       try {
         const response = await axios.get('http://localhost:3000/api/users/validate', { withCredentials: true });
@@ -42,5 +51,14 @@ export const useAuthStore = defineStore('auth', {
       this.userId = null;
       this.isAuthenticated = false;
     },
+    async getComments(postId) {
+      try {
+        const response = await axios.get(`http://localhost:3000/api/comments/${postId}`, { withCredentials: true });
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching comments:', error);
+        throw error;
+      }
+    }
   },
 });

@@ -14,7 +14,7 @@
             <button><FontAwesomeIcon :icon="faComment" @click="toggleComments" /> {{ post.commentCount }}</button>
             <button><FontAwesomeIcon :icon="faPaperPlane"/> {{ formatedShares }}</button>
         </div>
-        <Comments v-if="commentsVisible" :comments="post.comments"/>
+        <Comments v-if="commentsVisible" :postId="post.postId"/>
     </div>
 </template>
 
@@ -25,7 +25,7 @@ import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faComment } from '@fortawesome/free-regular-svg-icons';
 import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
-import { defineProps, ref, computed } from 'vue'
+import { defineProps, ref, computed, onMounted } from 'vue'
 import axios from 'axios';
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
@@ -41,6 +41,11 @@ const props = defineProps({
 
 const liked = ref(false)
 const commentsVisible = ref(false)
+
+onMounted(async () => {
+    liked.value = await authStore.checkIfLiked(props.post.postId);
+    console.log('liked', liked.value);
+});
 
 const formatedShares = computed(() => {
     const shares = props.post.shares;
@@ -76,8 +81,10 @@ async function toggleLike() {
     }
 
     try {
-        const response = await axios.post(url, { userId: authStore.userId }, { withCredentials: true });
-        console.log(response.data);
+        await axios.post(url, { userId: authStore.userId }, { withCredentials: true });
+        const response = await axios.get(`http://localhost:3000/api/posts/${props.post.postId}/likeCount`, { withCredentials: true });
+        props.post.likeCount = response.data.likeCount;
+        console.log('Post:', props.post.postId, 'liked:', liked.value, 'likeCount:', props.post.likeCount);
     } catch (error) {
         console.error('Error toggling like:', error);
     }

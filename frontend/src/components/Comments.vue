@@ -8,14 +8,32 @@
 <script setup>
 import CommentResponse from './CommentResponse.vue';
 import Comment from './Comment.vue';
-import { defineProps } from 'vue';
+import axios from 'axios';
+import { ref } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+import { defineProps, onMounted } from 'vue';
+
+const authStore = useAuthStore();
 
 const props = defineProps({
-    comments: {
-        type: Array,
+    postId: {
+        type: Number,
         required: true
     }
 })
+
+const comments = ref([])
+
+onMounted(async () => {
+    try {
+        const response = await authStore.getComments(props.postId);
+        comments.value = response
+        console.log('comments', comments.value)
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+    }
+})
+
 </script>
 
 <style scoped>

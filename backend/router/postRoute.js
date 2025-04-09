@@ -138,6 +138,19 @@ router.get("/:postId/likes", async (req, res) => {
     }
 });
 
+//GET LIKE COUNT ON A POST
+router.get("/:postId/likeCount", async (req, res) => {
+    const postId = req.params.postId;
+    const post = new Post({ db: req.db });
+    try {
+        const likeCount = await post.getPostLikes(postId);
+        res.status(200).json({ likeCount: likeCount.length });
+    } catch (error) {
+        console.error(`Error: ${error}`);
+        res.status(500).json({ error: "Internal server error" });
+    }
+});
+
 //GET ALL POSTS FROM USERS FOLLOWED BY USER
 router.get("/:userId/followedPosts", async (req, res) => {
     const userId = req.params.userId;
