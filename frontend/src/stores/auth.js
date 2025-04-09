@@ -12,6 +12,7 @@ export const useAuthStore = defineStore('auth', {
         const response = await axios.get('http://localhost:3000/api/users/validate', { withCredentials: true });
         this.userId = response.data.userId;
         this.isAuthenticated = true;
+        console.log('User ID:', this.userId);
       } catch (error) {
         console.error('Token validation failed:', error);
         this.logout();

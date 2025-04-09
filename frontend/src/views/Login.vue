@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import axios from 'axios'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
@@ -22,6 +22,29 @@ const authStore = useAuthStore()
 const identifier = ref('')
 const password = ref('')
 const router = useRouter()
+
+function getCookie(name) {
+  const value = `; ${document.cookie}`;
+  const parts = value.split(`; ${name}=`);
+  if (parts.length === 2) return parts.pop().split(';').shift();
+  return null;
+}
+
+// Usage
+if (getCookie('token')) {
+  console.log('Token exists');
+} else {
+  console.log('Token does not exist');
+}
+onMounted(async () => {
+  await authStore.fetchUser();
+  if (authStore.isAuthenticated) {
+    console.log('User is authenticated:', authStore.userId);
+    router.push('/');
+  } else {
+    console.log('User is not authenticated');
+  }
+});
 
 const login = async () => {
   try {

@@ -24,7 +24,7 @@
 
 
 <script setup>
-import { ref, watch, onMounted } from 'vue'
+import { ref, watch, onMounted, onUpdated } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import axios from 'axios'
@@ -41,14 +41,13 @@ watch(search, (newSearch) => {
 });
 
 onMounted(async () => {
-  if (document.cookie.includes('token')) {
-    await authStore.fetchUser();
-    if (!authStore.isAuthenticated) {
-      router.push('/login');
-    }
+  await authStore.fetchUser();
+  console.log('User fetched:', authStore.userId)
+  if (!authStore.isAuthenticated) {
+    console.log('Not authenticated, redirecting to login')
+    router.push('/login');
   }
 });
-
 
 const logout = () => {
   authStore.isAuthenticated = false
