@@ -6,6 +6,7 @@
                 <p style="font-weight: bold;" id="u-name">{{ post.username }}</p>
                 <p>{{ post.caption }}</p>
             </div>
+            <p id="post-time">{{ timeAgo(post.createdAt) }}</p>
         </div>
         <img v-if="post.image" :src="`http://localhost:5173/${post.image}`" alt="Post image" v-on:dblclick="toggleLike">
         <div>
@@ -29,6 +30,7 @@ import { defineProps, ref, computed, onMounted } from 'vue'
 import axios from 'axios';
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
+import { timeAgo } from '@/utils/date.js';
 
 const authStore = useAuthStore()
 
@@ -114,6 +116,13 @@ const visitProfile = () => {
     width: 50%;
 }
 
+#post-time{
+    font-size: 0.8em;
+    text-align: right;
+    color: #888;
+    margin-right: 5%;
+    width: 100%;
+}
 
 #profile-picture{
     width: 50px;

@@ -36,6 +36,7 @@ if (getCookie('token')) {
 } else {
   console.log('Token does not exist');
 }
+
 onMounted(async () => {
   await authStore.fetchUser();
   if (authStore.isAuthenticated) {
@@ -45,6 +46,7 @@ onMounted(async () => {
     console.log('User is not authenticated');
   }
 });
+
 
 const login = async () => {
   try {

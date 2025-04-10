@@ -10,17 +10,24 @@ const router = express.Router();
 
 
 export function authenticateToken(req, res, next) {
-    const token = req.cookies.token; // Token from cookie
-    console.log('Token:', token); // Debugging
+    console.log("Received request with cookies:", req.cookies);
+    const token = req.cookies.token;
+    console.log('Token:', token);
+    console.log("Token from cookies:", req.cookies.token);
   
-    if (!token) return res.sendStatus(401); // Unauthorized
+    if (!token) {
+        console.log("No token provided in request");
+        return res.status(401).json({ message: "No authentication token provided" });
+    }
   
     jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
-      if (err) return res.sendStatus(403); 
-  
-      req.user = user;
-      next();
-    });
+        if (err) {
+          console.log("Token verification failed:", err);
+          return res.status(403).json({ message: "Invalid or expired token" });
+        }
+        req.user = user;
+        next();
+      });
 }
 
 // Validation route
@@ -46,7 +53,9 @@ router.post('/register', async (req, res) => {
         const token = createToken(newUserId);
         res.cookie('token', token, {
             httpOnly: true,
-            sameSite: "lax"
+            sameSite: "lax",
+            secure: false,
+            path: '/'
         }).status(200).json({userId: loggedInUser.userId, token: token});
     } catch (error) {
         console.error(`Error: ${error}`);
@@ -69,7 +78,9 @@ router.post('/login', async (req, res) => {
       const token = createToken(loggedInUser.userId);
       res.cookie('token', token, {
         httpOnly: true,
-        sameSite: 'lax',
+            sameSite: "lax",
+            secure: false,
+            path: '/'
       }).status(200).json({ userId: loggedInUser.userId });
     } catch (error) {
       console.error(`Error: ${error}`);

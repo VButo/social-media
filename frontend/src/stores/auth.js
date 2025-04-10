@@ -20,15 +20,43 @@ export const useAuthStore = defineStore('auth', {
     },
     async fetchUser() {
       try {
-        const response = await axios.get('http://localhost:3000/api/users/validate', { withCredentials: true });
+        console.log("Token cookie found, validating...");
+        const response = await axios.get('http://localhost:3000/api/users/validate', { 
+          withCredentials: true 
+        });
         this.userId = response.data.userId;
         this.isAuthenticated = true;
-        console.log('User ID:', this.userId);
+        console.log('User authenticated, ID:', this.userId);
       } catch (error) {
-        console.error('Token validation failed:', error);
-        this.logout();
+        console.log('Authentication failed:', error.message);
+        this.userId = null;
+        this.isAuthenticated = false;
       }
     },
+    /*
+    async fetchUser() {
+  try {
+    // Check for the visible marker cookie
+    if (document.cookie.includes('auth_status=true')) {
+      console.log("Auth cookie found, validating...");
+      const response = await axios.get('http://localhost:3000/api/users/validate', { 
+        withCredentials: true 
+      });
+      this.userId = response.data.userId;
+      this.isAuthenticated = true;
+      console.log('User authenticated, ID:', this.userId);
+    } else {
+      console.log("No auth cookie found");
+      this.userId = null;
+      this.isAuthenticated = false;
+    }
+  } catch (error) {
+    console.log('Authentication failed:', error.message);
+    this.userId = null;
+    this.isAuthenticated = false;
+  }
+}
+    */
     async getFeedPosts() {
       try {
         const response = await axios.get(`http://localhost:3000/api/posts/${this.userId}/followedPosts`, { withCredentials: true });
@@ -50,6 +78,13 @@ export const useAuthStore = defineStore('auth', {
     logout() {
       this.userId = null;
       this.isAuthenticated = false;
+      axios.post('http://localhost:3000/api/users/logout', {}, { withCredentials: true })
+        .then(() => {
+          console.log('Logged out successfully')
+        })
+        .catch((error) => {
+          console.error('Error logging out:', error)
+        })
     },
     async getComments(postId) {
       try {

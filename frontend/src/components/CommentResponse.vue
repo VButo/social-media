@@ -10,8 +10,32 @@
 </template>
 
 <script setup>
+import { ref } from 'vue'
+import { useAuthStore } from '../stores/auth'
+import axios from 'axios'
+
+const props = defineProps({
+    postId: {
+        type: Number,
+        required: true
+    }
+})
+
+const authStore = useAuthStore()
+const response = ref('')
 const submitResponse = () => {
-    
+    if(response.value.trim() === '') {
+        alert('Response cannot be empty!')
+        return
+    }
+    const res = axios.post(`http://localhost:3000/api/comments/${props.postId}`, {
+        text: response.value,
+        userId: authStore.userId
+    }, { withCredentials: true })
+    .then(res => {
+        console.log('Response submitted:', res.data)
+        response.value = ''
+    })
 }
 </script>
 

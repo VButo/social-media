@@ -2,13 +2,12 @@
     <div class="comments">
         <Comment v-for="comment in comments" :key="comment.id" :comment="comment"/>
     </div>
-    <CommentResponse />
+    <CommentResponse :postId="postId"/>
 </template>
 
 <script setup>
 import CommentResponse from './CommentResponse.vue';
 import Comment from './Comment.vue';
-import axios from 'axios';
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { defineProps, onMounted } from 'vue';

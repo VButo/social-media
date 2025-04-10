@@ -27,7 +27,6 @@
 import { ref, watch, onMounted, onUpdated } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
-import axios from 'axios'
 import { useAuthStore } from './stores/auth'
 
 import { RouterLink, RouterView, useRouter } from 'vue-router'
@@ -40,6 +39,7 @@ watch(search, (newSearch) => {
   router.push({ path: '/users', query: { search: newSearch } });
 });
 
+
 onMounted(async () => {
   await authStore.fetchUser();
   console.log('User fetched:', authStore.userId)
@@ -49,17 +49,10 @@ onMounted(async () => {
   }
 });
 
-const logout = () => {
-  authStore.isAuthenticated = false
-  authStore.userId = null
-  axios.post('http://localhost:3000/api/users/logout', {}, { withCredentials: true })
-    .then(() => {
-      console.log('Logged out successfully')
-    })
-    .catch((error) => {
-      console.error('Error logging out:', error)
-    })
-  router.push('/login')
+
+async function logout() {
+  authStore.logout();
+  router.push('/login');
 }
 
 const routeHome = () => {
