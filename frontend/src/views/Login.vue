@@ -43,22 +43,26 @@ onMounted(async () => {
     console.log('User is authenticated:', authStore.userId);
     router.push('/');
   } else {
+
     console.log('User is not authenticated');
   }
 });
 
 
 const login = async () => {
+  console.log('Logging in with:', identifier.value, password.value);
   try {
+    console.log("Sending login request to server...");
     const response = await axios.post('http://localhost:3000/api/users/login', {
       identifier: identifier.value,
       password: password.value,
     }, { withCredentials: true });
-
+    console.log('Login response:', response.data);
     // Set userId and isAuthenticated in the auth store
     authStore.userId = response.data.userId;
     authStore.isAuthenticated = true;
 
+    console.log('Auth store updated, redirecting...');
     // Redirect to the feed
     router.push('/');
   } catch (error) {

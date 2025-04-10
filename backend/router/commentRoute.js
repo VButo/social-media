@@ -3,6 +3,20 @@ import Comment from "../objects/Comments.js";
 
 const router = e.Router();
 
+//GET A COMMENT BY ID
+router.get("/get/:commentId", async (req, res) => {
+    const commentId = req.params.commentId;
+    const comment = new Comment({ db: req.db });
+    try{
+        const fetchedComment = await comment.getCommentById(commentId);
+        if(!fetchedComment) return res.status(404).json({ error: "Comment not found" });
+        res.status(200).json(fetchedComment);
+    } catch(error) {
+        console.error(`Error: ${error}`);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
 //GET COMMENTS ON A POST
 router.get("/:postId", async (req, res) => {
     const postId = req.params.postId;
@@ -92,10 +106,11 @@ router.delete("/:replyId/replies", async (req, res) => {
 //LIKE A COMMENT
 router.post("/:commentId/like", async (req, res) => {
     const commentId = req.params.commentId;
+    const userId = req.body.userId;
     const comment = new Comment({ db: req.db});
 
     try{
-        const likedComment = await comment.likeComment(commentId);
+        const likedComment = await comment.likeComment(userId, commentId);
         if(!likedComment) return res.status(404).json({ error: "Couldn't like the comment" });
         res.status(200).json('Comment liked successfully!');
     } catch (error) {
@@ -107,10 +122,11 @@ router.post("/:commentId/like", async (req, res) => {
 //UNLIKE A COMMENT
 router.post("/:commentId/unlike", async (req, res) => {
     const commentId = req.params.commentId;
+    const userId = req.body.userId;
     const comment = new Comment({ db: req.db});
 
     try{
-        const unlikedComment = await comment.unlikeComment(commentId);
+        const unlikedComment = await comment.unlikeComment(userId, commentId);
         if(!unlikedComment) return res.status(404).json({ error: "Couldn't unlike the comment" });
         res.status(200).json('Comment unliked successfully!');
     } catch (error) {
@@ -122,10 +138,11 @@ router.post("/:commentId/unlike", async (req, res) => {
 //LIKE A REPLY
 router.post("/:replyId/replies/like", async (req, res) => {
     const replyId = req.params.replyId;
+    const userId = req.body.userId;
     const comment = new Comment({ db: req.db});
 
     try{
-        const likedReply = await comment.likeReply(replyId);
+        const likedReply = await comment.likeReply(userId, replyId);
         if(!likedReply) return res.status(404).json({ error: "Couldn't like the reply" });
         res.status(200).json('Reply liked successfully!');
     } catch( error) {
@@ -137,10 +154,11 @@ router.post("/:replyId/replies/like", async (req, res) => {
 //UNLIKE A REPLY
 router.post("/:replyId/replies/unlike", async (req, res) => {
     const replyId = req.params.replyId;
+    const userId = req.body.userId;
     const comment = new Comment({ db: req.db});
 
     try {
-        const unlikedReply = await comment.unlikeReply(replyId);
+        const unlikedReply = await comment.unlikeReply(userId, replyId);
         if(!unlikedReply) return res.status(404).json({ error: "Couldn't unlike the reply" });
         res.status(200).json('Reply unliked successfully!');
     } catch(error) {

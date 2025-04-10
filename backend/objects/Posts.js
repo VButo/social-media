@@ -11,7 +11,7 @@ class Post {
                  AS userCreatedAt,COUNT(l.postId) AS likeCount, COUNT(c.postId) AS commentCount
                  FROM post p
                  JOIN user u ON p.userId = u.userId
-                 LEFT JOIN \`like\` l ON p.postId = l.postId
+                 LEFT JOIN postLike l ON p.postId = l.postId
                  LEFT JOIN comment c ON p.postId = c.postId
                  WHERE p.userId = ?
                  GROUP BY p.postId
@@ -26,7 +26,7 @@ class Post {
     const sql = `SELECT p.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt,COUNT(l.postId) AS likeCount, COUNT(c.postId) AS commentCount
 	    FROM post p
 	    JOIN user u ON p.userId = u.userId
-	    LEFT JOIN \`like\` l ON p.postId = l.postId
+	    LEFT JOIN postLike l ON p.postId = l.postId
       LEFT JOIN comment c ON p.postId = c.postId
 	    WHERE p.postId = ?
 	    GROUP BY p.postId;`;
@@ -55,7 +55,7 @@ class Post {
 
   //LIKE A POST
   async likePost(data){
-    const sql = "INSERT INTO `like` (userId, postId, createdAt) VALUES (?, ?, NOW());";
+    const sql = "INSERT INTO postLike (userId, postId, createdAt) VALUES (?, ?, NOW());";
     const values = [data.userId, data.postId];
     const result = await this.db.query(sql, values);
     console.log('result is: ', result[0]);
@@ -64,7 +64,7 @@ class Post {
 
   //UNLIKE A POST
   async unlikePost(data) {
-    const sql = "DELETE FROM `like` WHERE userId = ? AND postId = ?;";
+    const sql = "DELETE FROM postLike WHERE userId = ? AND postId = ?;";
     const values = [data.userId, data.postId];
     const result = await this.db.query(sql, values);
     return result[0].affectedRows > 0;
@@ -72,7 +72,7 @@ class Post {
 
   //GET ALL LIKES ON A POST
   async getPostLikes(postId) {
-    const sql = 'SELECT u.*, l.createdAt AS likedAt FROM user u JOIN `like` l ON u.userId = l.userId WHERE l.postId = ?';
+    const sql = 'SELECT u.*, l.createdAt AS likedAt FROM user u JOIN postLike l ON u.userId = l.userId WHERE l.postId = ?';
     const values = [postId];
     const result = await this.db.query(sql, values);
     return result[0];
@@ -82,7 +82,7 @@ class Post {
   async getFollowedPosts(userId) {
     const sql = `SELECT p.*, u.username, u.profilePicture, u.userId AS authorId,
                   (SELECT COUNT(*) FROM comment WHERE postId = p.postId) AS commentCount,
-                  (SELECT COUNT(*) FROM \`like\` WHERE postId = p.postId) AS likeCount
+                  (SELECT COUNT(*) FROM postLike WHERE postId = p.postId) AS likeCount
                   FROM post p
                   JOIN user u ON p.userId = u.userId
                   WHERE p.userId IN (SELECT followerUserId FROM follow WHERE followingUserId = 13)

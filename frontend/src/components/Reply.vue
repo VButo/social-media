@@ -5,14 +5,21 @@
             <span class="reply-timestamp">{{ reply.timestamp }}</span>
         </div>
         <div class="reply-body">
-            <p>{{ reply.content }}</p>
+            <p>{{ reply.text }}</p>
         </div>
     </div>
 </template>
 
 <script setup>
 import { ref } from 'vue';
-const reply = ref({ userAvatar: 'path/to/avatar.jpg', username: 'User123', timestamp: '2023-10-01 12:00', content: 'This is a reply.' });
+import { defineProps } from 'vue';
+
+const props = defineProps({
+    reply: {
+        type: Object,
+        required: true
+    }
+});
 
 </script>
 
@@ -48,7 +55,6 @@ const reply = ref({ userAvatar: 'path/to/avatar.jpg', username: 'User123', times
 }
 
 .reply-body {
-    font-size: 1em;
-    color: #333;
+    font-family: Arial;
 }
 </style>

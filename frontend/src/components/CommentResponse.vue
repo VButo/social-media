@@ -10,7 +10,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, defineEmits } from 'vue'
 import { useAuthStore } from '../stores/auth'
 import axios from 'axios'
 
@@ -21,21 +21,30 @@ const props = defineProps({
     }
 })
 
+const emit = defineEmits(['responseSubmitted'])
+
 const authStore = useAuthStore()
 const response = ref('')
-const submitResponse = () => {
+async function submitResponse() {
     if(response.value.trim() === '') {
         alert('Response cannot be empty!')
         return
     }
-    const res = axios.post(`http://localhost:3000/api/comments/${props.postId}`, {
-        text: response.value,
-        userId: authStore.userId
-    }, { withCredentials: true })
-    .then(res => {
+    
+    try {
+        const res = await axios.post(`http://localhost:3000/api/comments/${props.postId}`, {
+            text: response.value,
+            userId: authStore.userId
+        }, { withCredentials: true })
+        
         console.log('Response submitted:', res.data)
         response.value = ''
-    })
+        
+        // Emit event to parent component to refresh comments
+        emit('commentAdded')
+    } catch (error) {
+        console.error('Error submitting comment:', error)
+    }
 }
 </script>
 

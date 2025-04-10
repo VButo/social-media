@@ -21,6 +21,7 @@
 
 <script setup>
 import Comments from './Comments.vue';
+import { watch } from 'vue';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
@@ -30,9 +31,11 @@ import { defineProps, ref, computed, onMounted } from 'vue'
 import axios from 'axios';
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
+import { usePostsStore } from '@/stores/posts.js'
 import { timeAgo } from '@/utils/date.js';
 
 const authStore = useAuthStore()
+const postsStore = usePostsStore()
 
 const props = defineProps({
     post: {
@@ -92,9 +95,22 @@ async function toggleLike() {
     }
 }
 const toggleComments = () => {
+    if (postsStore.openPostComment !== null && postsStore.openPostComment !== props.post.postId) {
+        postsStore.closePostCommentModal();
+    }
+
+    if (commentsVisible.value) {
+        postsStore.closePostCommentModal();
+    } else {
+        postsStore.openPostCommentModal(props.post.postId);
+    }
 
     commentsVisible.value = !commentsVisible.value
 }
+
+watch(() => postsStore.openPostComment, (newOpenReply) => {
+    commentsVisible.value = newOpenReply === props.post.postId;
+});
 
 const router = useRouter()
 

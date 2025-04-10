@@ -24,6 +24,7 @@ export const useAuthStore = defineStore('auth', {
         const response = await axios.get('http://localhost:3000/api/users/validate', { 
           withCredentials: true 
         });
+        console.log("validate success")
         this.userId = response.data.userId;
         this.isAuthenticated = true;
         console.log('User authenticated, ID:', this.userId);
@@ -33,30 +34,6 @@ export const useAuthStore = defineStore('auth', {
         this.isAuthenticated = false;
       }
     },
-    /*
-    async fetchUser() {
-  try {
-    // Check for the visible marker cookie
-    if (document.cookie.includes('auth_status=true')) {
-      console.log("Auth cookie found, validating...");
-      const response = await axios.get('http://localhost:3000/api/users/validate', { 
-        withCredentials: true 
-      });
-      this.userId = response.data.userId;
-      this.isAuthenticated = true;
-      console.log('User authenticated, ID:', this.userId);
-    } else {
-      console.log("No auth cookie found");
-      this.userId = null;
-      this.isAuthenticated = false;
-    }
-  } catch (error) {
-    console.log('Authentication failed:', error.message);
-    this.userId = null;
-    this.isAuthenticated = false;
-  }
-}
-    */
     async getFeedPosts() {
       try {
         const response = await axios.get(`http://localhost:3000/api/posts/${this.userId}/followedPosts`, { withCredentials: true });

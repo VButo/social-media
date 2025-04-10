@@ -2,13 +2,27 @@ class Comment {
     constructor(config) {
       this.db = config.db;
     }
-  
+  async getCommentById(commentId) {
+    const sql = `SELECT c.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt,
+                  (SELECT COUNT(*) FROM commentLike cl WHERE cl.commentId = c.commentId) AS likeCount,
+                  (SELECT COUNT(*) FROM reply r WHERE r.commentId = c.commentId) AS replyCount
+                  FROM comment c
+                  JOIN user u ON c.userId = u.userId 
+                  WHERE c.commentId = ?;`;
+    const values = [commentId];
+    const result = await this.db.query(sql, values);
+    return result[0][0];
+  }
+
+
     //GET COMMENTS ON A POST
     async getPostComments(postId) {
-      const sql = `SELECT c.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt
-                   FROM comment c
-                   JOIN user u ON c.userId = u.userId
-                   WHERE c.postId = ?`;
+      const sql = `SELECT c.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt,
+                    (SELECT COUNT(*) FROM commentLike cl WHERE cl.commentId = c.commentId) AS likeCount,
+                    (SELECT COUNT(*) FROM reply r WHERE r.commentId = c.commentId) AS replyCount
+                    FROM comment c
+                    JOIN user u ON c.userId = u.userId 
+                    WHERE c.postId = ?;`;
       const values = [postId];
       const result = await this.db.query(sql, values);
       return result[0];
@@ -16,7 +30,7 @@ class Comment {
 
     //CREATE A COMMENT
     async createComment(comment) {
-        const sql = `INSERT INTO comment (userId, postId, text, likes, createdAt) VALUES (?, ?, ?, 0, NOW())`;
+        const sql = `INSERT INTO comment (userId, postId, text, createdAt) VALUES (?, ?, ?, NOW())`;
         const values = [comment.userId, comment.postId, comment.text];
         const result = await this.db.query(sql, values);
         return result[0];
@@ -32,10 +46,11 @@ class Comment {
 
     //GET ALL REPLIES ON A COMMENT
     async getCommentReplies(commentId) {
-        const sql = `SELECT r.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt
+        const sql = `SELECT r.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt,
+					(SELECT COUNT(*) FROM replyLike rl WHERE rl.replyId = r.replyId) AS likeCount
                      FROM reply r
                      JOIN user u ON r.userId = u.userId
-                     WHERE r.commentId = ?`;
+                     WHERE r.commentId = ?;`;
         const values = [commentId];
         const result = await this.db.query(sql, values);
         return result[0];
@@ -43,7 +58,7 @@ class Comment {
 
     //CREATE A REPLY
     async createReply(reply) {
-        const sql = `INSERT INTO reply (userId, commentId, text, likes) VALUES (?, ?, ?, 0)`;
+        const sql = `INSERT INTO reply (userId, commentId, text) VALUES (?, ?, ?)`;
         const values = [reply.userId, reply.commentId, reply.text];
         const result = await this.db.query(sql, values);
         return result[0];
@@ -58,33 +73,33 @@ class Comment {
     }
 
     //LIKE A COMMENT
-    async likeComment(commentId) {
-        const sql = `UPDATE comment SET likes = likes + 1 WHERE commentId = ?`;
-        const values = [commentId];
+    async likeComment(userId, commentId) {
+        const sql = `INSERT INTO commentLike (userId, commentId, createdAt) VALUES (?, ?, NOW());`;
+        const values = [userId, commentId];
         const result = await this.db.query(sql, values);
         return result[0].affectedRows > 0;
     }
 
     //UNLIKE A COMMENT
-    async unlikeComment(commentId) {
-        const sql = `UPDATE comment SET likes = likes - 1 WHERE commentId = ?`;
-        const values = [commentId];
+    async unlikeComment(userId, commentId) {
+        const sql = `DELETE FROM commentLike WHERE userId = ? AND commentId = ?;`;
+        const values = [userId, commentId];
         const result = await this.db.query(sql, values);
         return result[0].affectedRows > 0;
     }
 
     //LIKE A REPLY
-    async likeReply(replyId) {
-        const sql = `UPDATE reply SET likes = likes + 1 WHERE replyId = ?`;
-        const values = [replyId];
+    async likeReply(userId, replyId) {
+        const sql = `INSERT INTO replyLike (userId, replyId, createdAt) VALUES (?, ?, NOW());`;
+        const values = [userId, replyId];
         const result = await this.db.query(sql, values);
         return result[0].affectedRows > 0;
     }
 
     //UNLIKE A REPLY
-    async unlikeReply(replyId) {
-        const sql = `UPDATE reply SET likes = likes - 1 WHERE replyId = ?`;
-        const values = [replyId];
+    async unlikeReply(userId, replyId) {
+        const sql = `DELETE FROM replyLike WHERE userId = ? AND replyId = ?;`;
+        const values = [userId, replyId];
         const result = await this.db.query(sql, values);
         return result[0].affectedRows > 0;
     }
