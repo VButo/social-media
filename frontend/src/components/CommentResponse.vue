@@ -40,8 +40,7 @@ async function submitResponse() {
         console.log('Response submitted:', res.data)
         response.value = ''
         
-        // Emit event to parent component to refresh comments
-        emit('commentAdded')
+        emit('responseSubmitted')
     } catch (error) {
         console.error('Error submitting comment:', error)
     }

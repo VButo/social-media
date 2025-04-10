@@ -15,7 +15,7 @@
             <button><FontAwesomeIcon :icon="faComment" @click="toggleComments" /> {{ post.commentCount }}</button>
             <button><FontAwesomeIcon :icon="faPaperPlane"/> {{ formatedShares }}</button>
         </div>
-        <Comments v-if="commentsVisible" :postId="post.postId"/>
+        <Comments v-if="commentsVisible" :postId="post.postId" @responseSubmitted="refresh"/>
     </div>
 </template>
 
@@ -46,6 +46,16 @@ const props = defineProps({
 
 const liked = ref(false)
 const commentsVisible = ref(false)
+
+const refresh = async () => {
+    try {
+        const response = await axios.get(`http://localhost:3000/api/posts/${props.post.postId}/post`, { withCredentials: true });
+        props.post = response.data;
+        console.log('Post:', props.post.postId, 'refreshed:', props.post);
+    } catch (error) {
+        console.error('Error fetching comments:', error);
+    }
+}
 
 onMounted(async () => {
     liked.value = await authStore.checkIfLiked(props.post.postId);

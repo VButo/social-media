@@ -32,7 +32,7 @@ class Post {
 	    GROUP BY p.postId;`;
     const values = [postId];
     const result = await this.db.query(sql, values);
-    return result[0];
+    return result[0][0];
   }
 
   //CREATE A POST

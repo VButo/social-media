@@ -2,7 +2,7 @@
     <div class="comments">
         <Comment v-for="comment in comments" :key="comment.id" :comment="comment" @responseSubmitted="refresh"/>
     </div>
-    <CommentResponse :postId="postId"/>
+    <CommentResponse :postId="postId" @responseSubmitted="refresh"/>
 </template>
 
 <script setup>
@@ -32,7 +32,8 @@ async function refresh() {
     try {
         const response = await authStore.getComments(props.postId);
         comments.value = response
-        console.log('comments', comments.value)
+        emit('responseSubmitted')
+        console.log('Comment crear+ted, comments: ', comments.value)
     } catch (error) {
         console.error('Error fetching comments:', error);
     }
