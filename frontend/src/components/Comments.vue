@@ -56,10 +56,19 @@ onMounted(async () => {
 <style scoped>
 .comments{
     width: 90%;
+    max-height: 450px;
     display: flex;
     flex-direction: column;
     align-items: center;
+    overflow-y: auto;
+    -ms-overflow-style: none;  /* Internet Explorer 10+ */
+    scrollbar-width: none;  /* Firefox */
 }
+
+.comments::-webkit-scrollbar { 
+    display: none;  /* Safari and Chrome */
+}
+
 .commentResponse{
     width: 90%;
     display: flex;

@@ -50,7 +50,6 @@ const authStore = useAuthStore();
 const isOpen = ref(false);
 const isInChat = ref(false);
 const newMessage = ref('');
-const index = ref();
 const user = ref({});
 const messagedUsers = ref([]);
 const newMessageUsers = ref([]);

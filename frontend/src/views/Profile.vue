@@ -31,7 +31,7 @@
         <div id="posts">
             <p v-if="posts.length === 0"></p>
             <h1 v-if="posts.length === 0" style="margin: 0 auto;">No posts yet!</h1>
-            <Post v-for="post in posts" :key="post.id" :post="post"/>
+            <ProfilePost v-for="post in posts" :key="post.id" :post="post"/>
         </div>
         <EditProfile v-if="toggleEdit" :profile="profile" @editProfile="handleEditProfile" @close="handleClose"/>
     </main>
@@ -40,7 +40,7 @@
 <script setup>
 import { ref, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import Post from '../components/Post.vue'
+import ProfilePost from '../components/ProfilePost.vue'
 import EditProfile from '@/components/EditProfile.vue'
 import { useAuthStore } from '@/stores/auth.js'
 import axios from 'axios'
@@ -146,15 +146,7 @@ img{
     border-radius: 50%;
     margin: 20px;
 }
-#posts {
-    width: 90%;
-    margin: 50px auto;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(200px, 1fr)); /* 3 columns with flexible sizes */
-    grid-auto-rows: auto; /* Allows posts to grow based on content */
-    gap: 20px; /* Adds spacing between posts */
-    align-items: start;
-}
+
 button{
     border: none;
     background: #333;

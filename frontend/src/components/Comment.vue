@@ -120,6 +120,7 @@ div{
     color: #888;
     font-size: 0.9em;
     text-align: right;
+    padding-right: 20px;
     width: 100%;
 }
 
