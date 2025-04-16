@@ -25,7 +25,6 @@ import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faComment } from '@fortawesome/free-regular-svg-icons';
-import { defineProps } from 'vue'
 import CommentResponse from './CommentResponse.vue';
 import { usePostsStore } from '@/stores/posts';
 import Reply from './Reply.vue';

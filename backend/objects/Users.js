@@ -71,25 +71,38 @@ class User {
 
     //UPDATE USER
     async update(userId, data) {
-        const { username, email, fullName, bio, profilePicture } = data;
-        let sql = 'SELECT * FROM user WHERE userId = ?';
-        let values = [userId];
-        let result = await this.db.query(sql, values);
-        if (result[0].length === 0) {
-            return null; // User not found
+        const { username, bio, profilePicture } = data;
+
+        let updateFields = [];
+        let values = [];
+        
+        if (username) {
+            updateFields.push('username = ?');
+            values.push(username);
+        }
+        if (bio) {
+            updateFields.push('bio = ?');
+            values.push(bio);
+        }
+        if (profilePicture) {
+            updateFields.push('profilePicture = ?');
+            values.push(profilePicture);
         }
 
-        let updateFields = [username ? 'username = ?' : '', email ? 'email = ?' : '', fullName ? 'fullName = ?' : '', bio ? 'bio = ?' : '', profilePicture ? 'profilePicture = ?' : ''].filter(Boolean).join(', ');
-        //Update only the fields that are provided and not null
-        sql = `UPDATE user SET ${updateFields} WHERE userId = ?`;
-        const updatedProfilePicture = profilePicture 
-        ? 'images/profilePictures/' + profilePicture 
-        : null;
-        values = [username, email, fullName, bio, updatedProfilePicture, userId];
-        // Remove undefined values from the array
-        values = values.filter(value => value);
-        result = await this.db.query(sql, values);
-        return result[0].affectedRows > 0;
+        if (updateFields.length === 0) {
+            return true;
+        }
+        values.push(userId);
+        
+        const sql = `UPDATE user SET ${updateFields.join(', ')} WHERE userId = ?`;
+        
+        try {
+            const result = await this.db.query(sql, values);
+            return result[0].affectedRows > 0;
+        } catch (error) {
+            console.error(`Error updating user: ${error}`);
+            throw error;
+        }
     }
 
     //DELETE USER

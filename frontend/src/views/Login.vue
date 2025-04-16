@@ -38,8 +38,8 @@ if (getCookie('token')) {
 }
 
 onMounted(async () => {
-  await authStore.fetchUser();
   if (authStore.isAuthenticated) {
+    await authStore.fetchUser();
     console.log('User is authenticated:', authStore.userId);
     router.push('/');
   } else {

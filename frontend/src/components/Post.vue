@@ -27,7 +27,7 @@ import { faHeart } from '@fortawesome/free-regular-svg-icons';
 import { faHeart as faHeartSolid } from '@fortawesome/free-solid-svg-icons';
 import { faComment } from '@fortawesome/free-regular-svg-icons';
 import { faPaperPlane } from '@fortawesome/free-regular-svg-icons';
-import { defineProps, ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import axios from 'axios';
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'

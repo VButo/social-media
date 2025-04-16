@@ -15,12 +15,13 @@
 
 <script setup>
 import axios from 'axios'
-import { ref, defineProps } from 'vue'
+import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth.js'
 
 const authStore = useAuthStore()
 
+const followers = ref([])
 const following = ref(false)
 const router = useRouter()
 
@@ -33,9 +34,9 @@ const props = defineProps({
 
 const toggleFollow = () => {
     following.value = !following.value
-    const url = `http://localhost:3000/api/users/${props.profile.userId}/follow`;
-    console.log(`http://localhost:3000/api/users/${props.profile.userId}/follow`);
-    const method = following.value ? 'POST' : 'DELETE';
+    const url = `http://localhost:3000/api/users/${props.profile.userId}/${following.value? '':'un'}follow`;
+    console.log('URL:', url);
+    const method = 'POST';
     axios({
         method: method,
         url: url,
@@ -51,6 +52,25 @@ const toggleFollow = () => {
         console.error('Error updating follow status:', error)
     })
 }
+
+onMounted(async () => {
+    if (props.profile.userId === authStore.userId) {
+        following.value = false
+    } else {
+        try{
+            const response = await axios.get(`http://localhost:3000/api/users/${authStore.userId}/followers`, { withCredentials: true });
+            followers.value = response.data;
+            console.log('Followers:', followers.value)
+            if(followers.value.some(follower => follower.userId === props.profile.userId)) {
+                following.value = true
+            } else {
+                following.value = false
+            }
+        } catch (error) {
+            console.error('Error fetching followers:', error);
+        }
+    }
+})
 
 const visitProfile = () => {
     router.push({ name: 'profile', params: { id: props.profile.userId } })
@@ -70,7 +90,6 @@ img{
 }
 #profile{
     display: flex;
-    /*justify-content to be next to eachother*/
     width: 100%;
 }
 main{

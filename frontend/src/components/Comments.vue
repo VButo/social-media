@@ -1,16 +1,17 @@
 <template>
-    <div class="comments">
-        <Comment v-for="comment in comments" :key="comment.id" :comment="comment" @responseSubmitted="refresh"/>
+    <div>
+        <div class="comments">
+            <Comment v-for="comment in comments" :key="comment.id" :comment="comment" @responseSubmitted="refresh"/>
+        </div>
+        <CommentResponse id="commentResponse" :postId="postId" @responseSubmitted="refresh"/>
     </div>
-    <CommentResponse :postId="postId" @responseSubmitted="refresh"/>
 </template>
 
 <script setup>
 import CommentResponse from './CommentResponse.vue';
 import Comment from './Comment.vue';
-import { ref, defineEmits } from 'vue';
+import { ref, defineEmits, onMounted } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-import { defineProps, onMounted } from 'vue';
 
 const authStore = useAuthStore();
 
@@ -58,6 +59,13 @@ onMounted(async () => {
     display: flex;
     flex-direction: column;
     align-items: center;
+}
+.commentResponse{
+    width: 90%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
 }
 button{
     border: none;

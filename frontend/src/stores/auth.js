@@ -52,16 +52,25 @@ export const useAuthStore = defineStore('auth', {
         throw error;
       }
     },
-    logout() {
-      this.userId = null;
-      this.isAuthenticated = false;
-      axios.post('http://localhost:3000/api/users/logout', {}, { withCredentials: true })
-        .then(() => {
-          console.log('Logged out successfully')
-        })
-        .catch((error) => {
-          console.error('Error logging out:', error)
-        })
+    async logout() {
+      try {
+        // Call backend logout endpoint
+        await axios.post('http://localhost:3000/api/users/logout', {}, {
+          withCredentials: true
+        });
+      } catch (error) {
+        console.error('Logout API error:', error);
+      } finally {
+        this.userId = null;
+        this.isAuthenticated = false;
+        this.user = null;
+        this.followingUsers = null;
+        this.likedPosts = {};
+        this.feedPosts = [];
+        
+        localStorage.removeItem('user');
+        sessionStorage.removeItem('user');
+      }
     },
     async getComments(postId) {
       try {

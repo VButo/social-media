@@ -8,11 +8,10 @@ class Post {
   // GET ALL USER POSTS
   async getAllPosts(userId) {
     const sql = `SELECT p.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt 
-                 AS userCreatedAt,COUNT(l.postId) AS likeCount, COUNT(c.postId) AS commentCount
+                 AS userCreatedAt, (SELECT COUNT(*) FROM postLike WHERE postId = p.postId) AS likeCount, 
+                 (SELECT COUNT(*) FROM comment WHERE postId = p.postId) AS commentCount
                  FROM post p
                  JOIN user u ON p.userId = u.userId
-                 LEFT JOIN postLike l ON p.postId = l.postId
-                 LEFT JOIN comment c ON p.postId = c.postId
                  WHERE p.userId = ?
                  GROUP BY p.postId
                  ORDER BY createdAt DESC;`;
@@ -85,7 +84,7 @@ class Post {
                   (SELECT COUNT(*) FROM postLike WHERE postId = p.postId) AS likeCount
                   FROM post p
                   JOIN user u ON p.userId = u.userId
-                  WHERE p.userId IN (SELECT followerUserId FROM follow WHERE followingUserId = 13)
+                  WHERE p.userId IN (SELECT followerUserId FROM follow WHERE followingUserId = ?)
                   ORDER BY p.createdAt DESC;`;
     const values = [userId];
     const result = await this.db.query(sql, values);

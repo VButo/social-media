@@ -1,13 +1,23 @@
 import express from 'express';
 import jwt from 'jsonwebtoken';
+import fs from "fs";
+import { fileURLToPath } from "url";
+import multer from "multer";
+import path from "path";
 import dotenv from 'dotenv';
-dotenv.config();
 import cookieParser from 'cookie-parser';
 
 import User from '../objects/Users.js'; // Adjust the path as necessary
 
 const router = express.Router();
 
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const upload = multer({
+    dest: "public/images/postImages",
+    limits: { fileSize: 5 * 1024 * 1024 }, // 5 MB limit
+});
 
 export function authenticateToken(req, res, next) {
     console.log("Received request with cookies:", req.cookies);
@@ -102,21 +112,60 @@ function createToken(userId) {
 }
 
 // Update route
-router.put('/:id', async(req, res) => {
+router.put('/:userId', upload.single('image'), async(req, res) => {
+    const { username, bio } = req.body;
+    const file = req.file;
+    const userId = req.params.userId;
+    let profilePicture = null;
+    try{
+        // Check if a file was uploaded
+        if (file) {
+            // Create directory if it doesn't exist
+            const targetDir = path.join(
+                __dirname,
+                "../../frontend/public/images/profilePictures"
+            );
+            
+            // Ensure directory exists
+            if (!fs.existsSync(targetDir)) {
+                fs.mkdirSync(targetDir, { recursive: true });
+            }
+        
+            const targetPath = path.join(
+                targetDir,
+                file.originalname
+            );
+        
+            // Rename the file to move it to the permanent location
+            await fs.promises.rename(file.path, targetPath);
+        
+            // Set the image URL
+            profilePicture = `images/profilePictures/${file.originalname}`;
+        }
+    } catch (error) {
+        console.error(`Error processing file: ${error}`);
+        return res.status(500).json({ error: 'Error processing file upload' });
+    }
+
     try{
         const user = new User({ db: req.db });
-        console.log(req.body);
-        const success = await user.update(req.params.id, req.body);
+        const userData = {
+            userId,
+            username,
+            bio,
+            profilePicture
+        };
+        
+        const success = await user.update(userId, userData);
 
         if (!success) return res.status(404).json({ error: 'User not found' });
         
         res.status(200).json({ message: 'User updated successfully' });
     }
     catch(error){
-        console.error(`Error: ${error}`);
+        console.error(`Error updating user: ${error}`);
         res.status(500).json({ error: 'Internal server error' });
     }
-    
 });
 
 // Delete route

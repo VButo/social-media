@@ -24,7 +24,7 @@
 
 
 <script setup>
-import { ref, watch, onMounted, onUpdated } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
 import { faBars } from '@fortawesome/free-solid-svg-icons'
 import { useAuthStore } from './stores/auth'
@@ -41,9 +41,10 @@ watch(search, (newSearch) => {
 
 
 onMounted(async () => {
-  await authStore.fetchUser();
+  if (authStore.isAuthenticated) {
+    await authStore.fetchUser();
   console.log('User fetched:', authStore.userId)
-  if (!authStore.isAuthenticated) {
+  } else {
     console.log('Not authenticated, redirecting to login')
     router.push('/login');
   }
@@ -51,7 +52,7 @@ onMounted(async () => {
 
 
 async function logout() {
-  authStore.logout();
+  await authStore.logout();
   router.push('/login');
 }
 
