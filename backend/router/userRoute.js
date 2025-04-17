@@ -63,8 +63,8 @@ router.post('/register', async (req, res) => {
         const token = createToken(newUserId);
         res.cookie('token', token, {
             httpOnly: true,
-            sameSite: "lax",
-            secure: false,
+            secure: true,
+            sameSite: 'None',
             path: '/'
         }).status(200).json({userId: loggedInUser.userId, token: token});
     } catch (error) {
@@ -80,6 +80,7 @@ router.post('/login', async (req, res) => {
   
       const user = new User({ db: req.db });
       const loggedInUser = await user.login(identifier, password);
+      console.log('user:', JSON.stringify(loggedInUser), identifier, password);
   
       if (!loggedInUser) {
         return res.status(401).json({ error: 'Invalid credentials' });
@@ -88,8 +89,8 @@ router.post('/login', async (req, res) => {
       const token = createToken(loggedInUser.userId);
       res.cookie('token', token, {
         httpOnly: true,
-            sameSite: "lax",
-            secure: false,
+            secure: true,
+            sameSite: 'None',
             path: '/'
       }).status(200).json({ userId: loggedInUser.userId });
     } catch (error) {
@@ -102,7 +103,8 @@ router.post('/login', async (req, res) => {
 router.post('/logout', (req, res) => {
     res.clearCookie('token', {
         httpOnly: true,
-        sameSite: 'lax',
+        secure: true,
+        sameSite: 'None',
     });
     res.status(200).json({ message: 'Logged out and cookie deleted' });
 });

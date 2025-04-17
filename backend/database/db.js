@@ -11,6 +11,7 @@ export const connectDB = async () => {
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME
         });
+        console.log(await connection.ping());
         return connection;
     } catch (error) {
         console.error(`Error: ${error}`);
