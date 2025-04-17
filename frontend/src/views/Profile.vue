@@ -2,7 +2,7 @@
     <main>
         <div id="profile">
             <div class="profile-header">
-                <img v-if="profile.profilePicture" :src="`http://localhost:5173/${profile.profilePicture}`" alt="Profile picture">
+                <img v-if="profile.profilePicture" :src="`http://localhost:${authStore.PORT}/${profile.profilePicture}`" alt="Profile picture">
                 <div v-if="profile.userId === authStore.userId">
                     <button @click="toggleEdit = !toggleEdit">Edit profile</button>
                     <button>Logout</button>

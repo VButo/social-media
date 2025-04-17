@@ -2,14 +2,14 @@
     <div class="post">
         <div class="post-content">
             <div id="user-info" @click="visitProfile">
-                <img :src="`http://localhost:5173/${post.profilePicture}`" id="profile-picture">
+                <img :src="`http://localhost:${authStore.PORT}/${post.profilePicture}`" id="profile-picture">
                 <div id="user-data">
                     <p style="font-weight: bold;" id="u-name">{{ post.username }}</p>
                     <p>{{ post.caption }}</p>
                 </div>
                 <p id="post-time">{{ timeAgo(post.createdAt) }}</p>
             </div>
-            <img v-if="post.image" :src="`http://localhost:5173/${post.image}`" alt="Post image" v-on:dblclick="toggleLike">
+            <img v-if="post.image" :src="`http://localhost:${authStore.PORT}/${post.image}`" alt="Post image" v-on:dblclick="toggleLike">
             <div>
                 <button v-if="!liked" @click="toggleLike"><FontAwesomeIcon :icon="faHeart"/> {{ formattedLikes }}</button>
                 <button v-else @click="toggleLike" style="color: red;"><FontAwesomeIcon :icon="faHeartSolid"/> {{ formattedLikes }}</button>

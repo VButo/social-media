@@ -1,7 +1,7 @@
 <template>
     <main>
         <div id="profile" @click="visitProfile">
-            <img :src="`http://localhost:5173/${profile.profilePicture}`" alt="">
+            <img :src="`http://localhost:5500/${profile.profilePicture}`" alt="">
             <div>
                 <h1>{{ profile.fullName }}</h1>
                 <p>{{ profile.username }}</p>

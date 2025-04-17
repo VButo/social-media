@@ -7,6 +7,7 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated: false,
     feedPosts: [],
     followingUsers: null,
+    PORT: 5500
   }),
   actions: {
     async checkIfLiked(postId) {
