@@ -34,8 +34,8 @@ jobs:
     - name: Backend - Upload build artifacts
       uses: actions/upload-artifact@v4
       with:
-        name: backend-dist
-        path: backend/dist/
+        name: backend-build
+        path: build/
 
   build-frontend:
     runs-on: ubuntu-latest
