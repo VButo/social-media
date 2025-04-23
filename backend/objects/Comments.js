@@ -4,7 +4,7 @@ class Comment {
     }
   async getCommentById(commentId) {
     const sql = `SELECT c.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt,
-                  (SELECT COUNT(*) FROM commentLike cl WHERE cl.commentId = c.commentId) AS likeCount,
+                  (SELECT COUNT(*) FROM commentlike cl WHERE cl.commentId = c.commentId) AS likeCount,
                   (SELECT COUNT(*) FROM reply r WHERE r.commentId = c.commentId) AS replyCount
                   FROM comment c
                   JOIN user u ON c.userId = u.userId 
@@ -18,7 +18,7 @@ class Comment {
     //GET COMMENTS ON A POST
     async getPostComments(postId) {
       const sql = `SELECT c.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt,
-                    (SELECT COUNT(*) FROM commentLike cl WHERE cl.commentId = c.commentId) AS likeCount,
+                    (SELECT COUNT(*) FROM commentlike cl WHERE cl.commentId = c.commentId) AS likeCount,
                     (SELECT COUNT(*) FROM reply r WHERE r.commentId = c.commentId) AS replyCount
                     FROM comment c
                     JOIN user u ON c.userId = u.userId 
@@ -47,7 +47,7 @@ class Comment {
     //GET ALL REPLIES ON A COMMENT
     async getCommentReplies(commentId) {
         const sql = `SELECT r.*, u.username, u.profilePicture, u.userId AS authorId, u.bio, u.createdAt AS userCreatedAt,
-					(SELECT COUNT(*) FROM replyLike rl WHERE rl.replyId = r.replyId) AS likeCount
+					(SELECT COUNT(*) FROM replylike rl WHERE rl.replyId = r.replyId) AS likeCount
                      FROM reply r
                      JOIN user u ON r.userId = u.userId
                      WHERE r.commentId = ?;`;
@@ -72,33 +72,33 @@ class Comment {
         return result[0].affectedRows > 0;
     }
 
-    //LIKE A COMMENT
+    //like A COMMENT
     async likeComment(userId, commentId) {
-        const sql = `INSERT INTO commentLike (userId, commentId, createdAt) VALUES (?, ?, NOW());`;
+        const sql = `INSERT INTO commentlike (userId, commentId, createdAt) VALUES (?, ?, NOW());`;
         const values = [userId, commentId];
         const result = await this.db.query(sql, values);
         return result[0].affectedRows > 0;
     }
 
-    //UNLIKE A COMMENT
+    //UNlike A COMMENT
     async unlikeComment(userId, commentId) {
-        const sql = `DELETE FROM commentLike WHERE userId = ? AND commentId = ?;`;
+        const sql = `DELETE FROM commentlike WHERE userId = ? AND commentId = ?;`;
         const values = [userId, commentId];
         const result = await this.db.query(sql, values);
         return result[0].affectedRows > 0;
     }
 
-    //LIKE A REPLY
+    //like A REPLY
     async likeReply(userId, replyId) {
-        const sql = `INSERT INTO replyLike (userId, replyId, createdAt) VALUES (?, ?, NOW());`;
+        const sql = `INSERT INTO replylike (userId, replyId, createdAt) VALUES (?, ?, NOW());`;
         const values = [userId, replyId];
         const result = await this.db.query(sql, values);
         return result[0].affectedRows > 0;
     }
 
-    //UNLIKE A REPLY
+    //UNlike A REPLY
     async unlikeReply(userId, replyId) {
-        const sql = `DELETE FROM replyLike WHERE userId = ? AND replyId = ?;`;
+        const sql = `DELETE FROM replylike WHERE userId = ? AND replyId = ?;`;
         const values = [userId, replyId];
         const result = await this.db.query(sql, values);
         return result[0].affectedRows > 0;

@@ -12,6 +12,7 @@
     "build": "node build.js && cd ../build && npm install"
   },
   "dependencies": {
+    "@google-cloud/cloud-sql-connector": "^1.7.1",
     "argon2": "^0.41.1",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
