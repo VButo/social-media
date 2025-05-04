@@ -54,7 +54,7 @@ const refreshComments = () =>{
 async function toggleLike() {
     liked.value = !liked.value
 
-    const url = `http://localhost:3000/api/comments/${props.comment.commentId}/${!liked.value ? 'un' : ''}like`;
+    const url = `${authStore.backendURL}/api/comments/${props.comment.commentId}/${!liked.value ? 'un' : ''}like`;
 
     await authStore.fetchUser();
 
@@ -65,7 +65,7 @@ async function toggleLike() {
 
     try{
         await axios.post(url, { userId: authStore.userId }, { withCredentials: true })
-        const response = await axios.get(`http://localhost:3000/api/comments/get/${props.comment.commentId}`, { withCredentials: true })
+        const response = await axios.get(`${authStore.backendURL}/api/comments/get/${props.comment.commentId}`, { withCredentials: true })
         console.log(response.data.likeCount)
         props.comment.likeCount = response.data.likeCount
     } catch (error) {
@@ -92,7 +92,7 @@ watch(() => postsStore.openCommentReply, (newOpenReply) => {
 
 onMounted(async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/api/comments/${props.comment.commentId}/replies`, { withCredentials: true });
+        const response = await axios.get(`${authStore.backendURL}/api/comments/${props.comment.commentId}/replies`, { withCredentials: true });
         replies.value = response.data;
         console.log('replies', replies.value);
     } catch (error) {

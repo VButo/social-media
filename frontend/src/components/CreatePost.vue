@@ -27,7 +27,7 @@ async function post() {
         formData.append('image', postImage.value);
     }
     try{
-        const result = await axios.post(`http://localhost:3000/api/posts/${authStore.userId}`, formData, {
+        const result = await axios.post(`${authStore.backendURL}/api/posts/${authStore.userId}`, formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
         },

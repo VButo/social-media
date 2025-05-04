@@ -59,7 +59,7 @@ const isFormValid = computed(() => {
 });
 
 const register = () => {
-    axios.post('http://localhost:3000/api/users/register', {
+    axios.post(`${authStore.backendURL}/api/users/register`, {
         username: username.value,
         password: password.value,
         email: email.value,

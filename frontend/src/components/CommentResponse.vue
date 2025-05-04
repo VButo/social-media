@@ -32,7 +32,7 @@ async function submitResponse() {
     }
     
     try {
-        const res = await axios.post(`http://localhost:3000/api/comments/${props.postId}`, {
+        const res = await axios.post(`${authStore.backendURL}/api/comments/${props.postId}`, {
             text: response.value,
             userId: authStore.userId
         }, { withCredentials: true })

@@ -51,7 +51,7 @@ function handleFileUpload(event) {
 
 async function deleteProfile() {
     try {
-        await axios.delete(`http://localhost:3000/api/users/${props.profile.userId}`, { withCredentials: true });
+        await axios.delete(`${authStore.backendURL}/api/users/${props.profile.userId}`, { withCredentials: true });
         emit('close');
     } catch (error) {
         console.error('Error deleting profile:', error);
@@ -72,7 +72,7 @@ async function saveEdit() {
         }
         
         const response = await axios.put(
-            `http://localhost:3000/api/users/${props.profile.userId}`, 
+            `${authStore.backendURL}/api/users/${props.profile.userId}`, 
             formData, 
             {
                 withCredentials: true,

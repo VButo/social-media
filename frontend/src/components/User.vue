@@ -34,7 +34,7 @@ const props = defineProps({
 
 const toggleFollow = () => {
     following.value = !following.value
-    const url = `http://localhost:3000/api/users/${props.profile.userId}/${following.value? '':'un'}follow`;
+    const url = `${authStore.backendURL}/api/users/${props.profile.userId}/${following.value? '':'un'}follow`;
     console.log('URL:', url);
     const method = 'POST';
     axios({
@@ -58,7 +58,7 @@ onMounted(async () => {
         following.value = false
     } else {
         try{
-            const response = await axios.get(`http://localhost:3000/api/users/${authStore.userId}/followers`, { withCredentials: true });
+            const response = await axios.get(`${authStore.backendURL}/api/users/${authStore.userId}/followers`, { withCredentials: true });
             followers.value = response.data;
             console.log('Followers:', followers.value)
             if(followers.value.some(follower => follower.userId === props.profile.userId)) {

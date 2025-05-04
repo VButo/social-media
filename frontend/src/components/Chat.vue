@@ -64,7 +64,7 @@ const closeChat = () => {
 
 async function toggleOpenChat(userId) {
     isInChat.value = !isInChat.value;
-    user.value = await axios.get(`http://localhost:3000/api/users/${userId}`, {
+    user.value = await axios.get(`${authStore.backendURL}/api/users/${userId}`, {
         withCredentials: true
     })
     .then(response => {
@@ -79,7 +79,7 @@ onMounted(async () => {
             if (!authStore.followingUsers) {
                 await authStore.getFollowingUsers();
             }
-            const response = await axios.get(`http://localhost:3000/api/messages/${authStore.userId}`, {
+            const response = await axios.get(`${authStore.backendURL}/api/messages/${authStore.userId}`, {
                 withCredentials: true
             });
             messagedUsers.value = response.data;

@@ -49,7 +49,7 @@ const closeChat = () => {
 
 const fetchMessages = async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/api/messages/${currentUserId.value}/${targetUserId.value}`, { withCredentials: true });
+        const response = await axios.get(`${authStore.backendURL}/api/messages/${currentUserId.value}/${targetUserId.value}`, { withCredentials: true });
         messages.value = response.data.messages;
     } catch (error) {
         console.error('Error fetching messages:', error);

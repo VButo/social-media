@@ -17,7 +17,7 @@ const users = ref([])
 async function fetchUsers() {
     try {
         const searchQuery = route.query.search || '';
-        const response = await axios.get(`http://localhost:3000/api/users?search=${searchQuery}`, { withCredentials: true });
+        const response = await axios.get(`${authStore.backendURL}/api/users?search=${searchQuery}`, { withCredentials: true });
         users.value = response.data;
     } catch (error) {
         console.error('Error fetching users:', error);

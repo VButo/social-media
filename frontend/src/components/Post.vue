@@ -50,7 +50,7 @@ const commentsVisible = ref(false)
 
 const refresh = async () => {
     try {
-        const response = await axios.get(`http://localhost:3000/api/posts/${props.post.postId}/post`, { withCredentials: true });
+        const response = await axios.get(`${authStore.backendURL}/api/posts/${props.post.postId}/post`, { withCredentials: true });
         props.post = response.data;
         console.log('Post:', props.post.postId, 'refreshed:', props.post);
     } catch (error) {
@@ -87,7 +87,7 @@ const formattedLikes = computed(() => {
 async function toggleLike() {
     liked.value = !liked.value;
 
-    const url = `http://localhost:3000/api/posts/${props.post.postId}/${!liked.value ? 'un' : ''}like`;
+    const url = `${authStore.backendURL}/api/posts/${props.post.postId}/${!liked.value ? 'un' : ''}like`;
 
     await authStore.fetchUser();
 
@@ -98,7 +98,7 @@ async function toggleLike() {
 
     try {
         await axios.post(url, { userId: authStore.userId }, { withCredentials: true });
-        const response = await axios.get(`http://localhost:3000/api/posts/${props.post.postId}/likeCount`, { withCredentials: true });
+        const response = await axios.get(`${authStore.backendURL}/api/posts/${props.post.postId}/likeCount`, { withCredentials: true });
         props.post.likeCount = response.data.likeCount;
         console.log('Post:', props.post.postId, 'liked:', liked.value, 'likeCount:', props.post.likeCount);
     } catch (error) {
