@@ -12,15 +12,16 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 export const connectDB = async () => {
     try {
+        // Parse the credentials JSON
         const credentialsJson = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
         
-        // Create a GoogleAuth instance first
-        const auth = new GoogleAuth();
-        // Then call fromJSON on the instance
-        const authClient = auth.fromJSON(credentialsJson);
-        
+        // Create connector with proper configuration
         const connector = new Connector({
-            auth: authClient
+            // Directly create GoogleAuth with credentials and required scope
+            auth: new GoogleAuth({
+                credentials: credentialsJson,  // Pass credentials object directly
+                scopes: ['https://www.googleapis.com/auth/sqlservice.admin']  // Required scope
+            })
         });
         
         const clientOpts = await connector.getOptions({
