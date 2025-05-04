@@ -12,10 +12,11 @@ import { Server } from 'socket.io';
 
 const app = express();
 const frontPort = 5500;
+const FRONTEND_URL = process.env.FRONTEND_URL || `http://127.0.0.1:${frontPort}`;
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: `http://127.0.0.1:${frontPort}`,
+        origin: `${FRONTEND_URL}:${frontPort}`,
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -25,7 +26,7 @@ const db_connection = await connectDB();
 
 
 app.use(cors({
-    origin: `http://127.0.0.1:${frontPort}`,
+    origin: `${FRONTEND_URL}:${frontPort}`,
     credentials: true
   }));
 //app.use(cors());
