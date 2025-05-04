@@ -129,7 +129,7 @@ router.get("/:postId/likes", async (req, res) => {
     const postId = req.params.postId;
     const post = new Post({ db: req.db });
     try{
-        const postLikes = await post.getPostLikes(postId);
+        const postLikes = await post.getLikesOnPost(postId);
         if (!postLikes) return res.status(404).json({ error: "Likes not found" });
         res.status(200).json(postLikes);
     } catch (error) {
@@ -143,7 +143,7 @@ router.get("/:postId/likeCount", async (req, res) => {
     const postId = req.params.postId;
     const post = new Post({ db: req.db });
     try {
-        const likeCount = await post.getPostLikes(postId);
+        const likeCount = await post.getLikesOnPost(postId);
         res.status(200).json({ likeCount: likeCount.length });
     } catch (error) {
         console.error(`Error: ${error}`);

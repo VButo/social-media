@@ -143,7 +143,7 @@ router.get("/:postId/likeCount", async (req, res) => {
     const postId = req.params.postId;
     const post = new Post({ db: req.db });
     try {
-        const likeCount = await post.getPostLikes(postId);
+        const likeCount = await post.getLikesOnPost(postId);
         res.status(200).json({ likeCount: likeCount.length });
     } catch (error) {
         console.error(`Error: ${error}`);
