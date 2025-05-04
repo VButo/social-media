@@ -53,7 +53,7 @@ const login = async () => {
   console.log('Logging in with:', identifier.value, password.value);
   try {
     console.log("Sending login request to server...");
-    const response = await axios.post('http://localhost:3000/api/users/login', {
+    const response = await axios.post(`${authStore.backendURL}/api/users/login`, {
       identifier: identifier.value,
       password: password.value,
     }, { withCredentials: true });
