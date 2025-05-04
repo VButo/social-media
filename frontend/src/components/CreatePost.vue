@@ -33,7 +33,7 @@ async function post() {
         },
         withCredentials: true
         });
-        console.log(result.data);  
+        console.log(result.data);
     } catch(error) {
         console.error('There was an error while uploading the post!', error)
     }

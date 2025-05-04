@@ -39,9 +39,9 @@ app.use(express.json());
 // Middleware to add the DB connection to request object
 app.use((req, res, next) => {
     req.db = db_connection;
+    console.log('Database connection state:', db_connection.state); // Log connection status
     next();
 });
-
 app.use((req, res, next) => {
     if(req.path === '/api/users/login' || req.path === '/api/users/register') {
         next();
