@@ -7,12 +7,13 @@ export const useAuthStore = defineStore('auth', {
     isAuthenticated: false,
     feedPosts: [],
     followingUsers: null,
-    PORT: 5500
+    PORT: 5500,
+    backendURL: "https://social-media-nbs1.onrender.com"
   }),
   actions: {
     async checkIfLiked(postId) {
       try {
-        const response = await axios.get(`http://localhost:3000/api/posts/${postId}/likes`, { withCredentials: true });
+        const response = await axios.get(`${this.backendURL}/api/posts/${postId}/likes`, { withCredentials: true });
         return response.data.some((like) => like.userId === this.userId);
       } catch (error) {
         console.error('Error fetching likes:', error);
@@ -22,7 +23,7 @@ export const useAuthStore = defineStore('auth', {
     async fetchUser() {
       try {
         console.log("Token cookie found, validating...");
-        const response = await axios.get('http://localhost:3000/api/users/validate', { 
+        const response = await axios.get(`${this.backendURL}/api/users/validate`, { 
           withCredentials: true 
         });
         console.log("validate success")
@@ -37,7 +38,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async getFeedPosts() {
       try {
-        const response = await axios.get(`http://localhost:3000/api/posts/${this.userId}/followedPosts`, { withCredentials: true });
+        const response = await axios.get(`${this.backendURL}/api/posts/${this.userId}/followedPosts`, { withCredentials: true });
         this.feedPosts = response.data;
       } catch (error) {
         console.error('Error fetching feed posts:', error);
@@ -46,7 +47,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async getFollowingUsers() {
       try {
-        const response = await axios.get(`http://localhost:3000/api/users/${this.userId}/followers`, { withCredentials: true });
+        const response = await axios.get(`${this.backendURL}/api/users/${this.userId}/followers`, { withCredentials: true });
         this.followingUsers = response.data;
       } catch (error) {
         console.error('Error fetching following users:', error);
@@ -56,7 +57,7 @@ export const useAuthStore = defineStore('auth', {
     async logout() {
       try {
         // Call backend logout endpoint
-        await axios.post('http://localhost:3000/api/users/logout', {}, {
+        await axios.post(`${this.backendURL}/api/users/logout`, {}, {
           withCredentials: true
         });
       } catch (error) {
@@ -75,7 +76,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async getComments(postId) {
       try {
-        const response = await axios.get(`http://localhost:3000/api/comments/${postId}`, { withCredentials: true });
+        const response = await axios.get(`${this.backendURL}/api/comments/${postId}`, { withCredentials: true });
         return response.data;
       } catch (error) {
         console.error('Error fetching comments:', error);
