@@ -11,7 +11,10 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 export const connectDB = async () => {
     try {
-        const connector = new Connector();
+        const credentialsJson = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+        const connector = new Connector({
+            auth: GoogleAuth.fromJSON(credentialsJson)
+        });
         
         const clientOpts = await connector.getOptions({
             instanceConnectionName: process.env.INSTANCE_CONNECTION_NAME,
