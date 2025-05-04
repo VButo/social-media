@@ -10,6 +10,8 @@ import cors from 'cors';
 import http from 'http';
 import { Server } from 'socket.io';
 
+console.log("FRONTEND_URL being used:", process.env.FRONTEND_URL);
+
 const app = express();
 const frontPort = 5500;
 const FRONTEND_URL = process.env.FRONTEND_URL || `http://127.0.0.1:${frontPort}`;
