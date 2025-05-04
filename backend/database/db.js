@@ -3,6 +3,7 @@ import dotenv from 'dotenv';
 import { Connector } from '@google-cloud/cloud-sql-connector';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { GoogleAuth } from 'google-auth-library';
 
 // Get current file's directory for proper .env loading
 const __filename = fileURLToPath(import.meta.url);
