@@ -16,7 +16,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || `http://127.0.0.1:${frontPort}`
 const server = http.createServer(app);
 const io = new Server(server, {
     cors: {
-        origin: `${FRONTEND_URL}`,
+        origin: FRONTEND_URL,
         methods: ['GET', 'POST'],
         credentials: true
     }
@@ -26,7 +26,7 @@ const db_connection = await connectDB();
 
 
 app.use(cors({
-    origin: `${FRONTEND_URL}`,
+    origin: FRONTEND_URL,
     credentials: true
   }));
 //app.use(cors());
