@@ -13,8 +13,14 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 export const connectDB = async () => {
     try {
         const credentialsJson = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
+        
+        // Create a GoogleAuth instance first
+        const auth = new GoogleAuth();
+        // Then call fromJSON on the instance
+        const authClient = auth.fromJSON(credentialsJson);
+        
         const connector = new Connector({
-            auth: GoogleAuth.fromJSON(credentialsJson)
+            auth: authClient
         });
         
         const clientOpts = await connector.getOptions({
@@ -35,7 +41,7 @@ export const connectDB = async () => {
     } catch (error) {
         console.error(`Error connecting to database: ${error.message}`);
         console.error(error.stack);
-        throw error; // Re-throw to allow handling by caller
+        throw error;
     }
 };
 
