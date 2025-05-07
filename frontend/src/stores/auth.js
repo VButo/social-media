@@ -8,7 +8,8 @@ export const useAuthStore = defineStore('auth', {
     feedPosts: [],
     followingUsers: null,
     PORT: 5500,
-    backendURL: "https://social-media-nbs1.onrender.com"
+    backendURL: "https://social-media-nbs1.onrender.com",
+    frontendURL: "https://social-media-neon-five.vercel.app"
   }),
   actions: {
     async checkIfLiked(postId) {
