@@ -89,6 +89,15 @@ export const useAuthStore = defineStore('auth', {
         throw error;
       }
     },
+    async getProfile(userId){
+      try {
+        const response = await axios.get(`${this.backendURL}/api/users/${userId}`, { withCredentials: true });
+        return response.data;
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+        throw error;
+      }
+    },
     async getComments(postId) {
       try {
         const response = await axios.get(`${this.backendURL}/api/comments/${postId}`, { withCredentials: true });

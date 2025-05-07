@@ -67,8 +67,7 @@ const userId = route.params.id
 
 onMounted(async () => {
   try {
-    const profileResponse = await axios.get(`${authStore.backendURL}/api/users/${userId}`, { withCredentials: true });
-    profile.value = profileResponse.data;
+    profile.value = authStore.getProfile(userId);
     console.log('profile', profile.value)
     const postsResponse = await axios.get(`${authStore.backendURL}/api/posts/${userId}`, { withCredentials: true });
     const response = await axios.get(`${authStore.backendURL}/api/users/${authStore.userId}/followers`, { withCredentials: true });
