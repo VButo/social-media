@@ -1,144 +1,184 @@
-To handle the userId properly without breaking the app or causing issues like infinite redirects, you can implement the following solution:
+# Social Media Web Application
 
-1. Use a Global State Management Solution
-Use a global state management library like Pinia (already installed in your project) to store and manage the userId. This allows you to access the userId across components without directly relying on localStorage in App.vue.
+A full-stack social media application featuring posts, comments, user profiles, real-time chat, and more.
 
-Steps:
-Create a Pinia Store for Authentication Create a new file src/stores/auth.js:
+## 🌐 Live Demo
 
-// filepath: c:\Users\Home\Backend\social_media\social-media\frontend\src\stores\auth.js
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+Visit the application at [https://social-media-neon-five.vercel.app/](https://social-media-neon-five.vercel.app/)
 
-export const useAuthStore = defineStore('auth', () => {
-  const userId = ref(localStorage.getItem('userId') || null);
-  const router = useRouter();
+Backend API: [https://social-media-nbs1.onrender.com](https://social-media-nbs1.onrender.com)
 
-  const setUserId = (id) => {
-    userId.value = id;
-    if (id) {
-      localStorage.setItem('userId', id);
-    } else {
-      localStorage.removeItem('userId');
-    }
-  };
+## ✨ Features
 
-  const logout = () => {
-    setUserId(null);
-    router.push('/login');
-  };
-
-  return { userId, setUserId, logout };
-});
+- **User Authentication**: Secure registration and login
+- **User Profiles**: Customizable profiles with bio and profile picture upload[^1][^9]
+- **Posts Feed**: View posts from followed users[^2][^6]
+- **Post Interaction**: Create posts with images, like and comment on posts[^6][^8]
+- **Comments \& Replies**: Threaded comment system with replies[^12]
+- **Real-time Chat**: Private messaging between users using Socket.io[^1][^5]
+- **Follow System**: Follow/unfollow other users[^8]
+- **Responsive Design**: Mobile-friendly interface[^12]
 
 
-Update App.vue Remove the localStorage logic from App.vue and use the auth store instead:
+## 🛠️ Technology Stack
 
-// filepath: c:\Users\Home\Backend\social_media\social-media\frontend\src\App.vue
-import { useAuthStore } from '@/stores/auth';
+### Frontend
 
-const auth = useAuthStore();
-const userId = auth.userId;
-
-const logout = () => {
-  auth.logout();
-};
-
-Protect Routes in the Router Add a navigation guard in the router to check for userId before accessing protected routes:
-
-// filepath: c:\Users\Home\Backend\social_media\social-media\frontend\src\router\index.js
-import { useAuthStore } from '@/stores/auth';
-
-router.beforeEach((to, from, next) => {
-  const auth = useAuthStore();
-  const isAuthenticated = !!auth.userId;
-
-  if (to.name !== 'login' && to.name !== 'register' && !isAuthenticated) {
-    next({ name: 'login' });
-  } else if ((to.name === 'login' || to.name === 'register') && isAuthenticated) {
-    next({ name: 'feed' });
-  } else {
-    next();
-  }
-});
-
-2. Handle userId in Login and Registration
-Ensure that userId is set in the store after login or registration:
-
-Login.vue
-
-import { useAuthStore } from '@/stores/auth';
-
-const auth = useAuthStore();
-
-const login = async () => {
-  try {
-    const response = await axios.post('http://localhost:3000/api/users/login', {
-      identifier: identifier.value,
-      password: password.value,
-    }, { withCredentials: true });
-
-    auth.setUserId(response.data.userId);
-    router.push('/');
-  } catch (error) {
-    console.error('Login failed:', error);
-    alert('Invalid credentials');
-  }
-};
-
-Registration.vue
-
-import { useAuthStore } from '@/stores/auth';
-
-const auth = useAuthStore();
-
-const register = async () => {
-  try {
-    const response = await axios.post('http://localhost:3000/api/users/register', {
-      username: username.value,
-      password: password.value,
-      email: email.value,
-      fullName: fullName.value,
-    }, { withCredentials: true });
-
-    auth.setUserId(response.data.userId);
-    router.push('/');
-  } catch (error) {
-    console.error('Registration failed:', error);
-    alert('An error occurred during registration');
-  }
-};
-
-3. Handle userId in /profile/:id
-In the Profile.vue component, ensure that the userId is fetched dynamically and handle cases where it is missing:
-
-import { useAuthStore } from '@/stores/auth';
-
-const auth = useAuthStore();
-const route = useRoute();
-const router = useRouter();
-
-const userId = route.params.id || auth.userId;
-
-if (!userId) {
-  router.push('/login');
-}
-
-onMounted(async () => {
-  try {
-    const profileResponse = await axios.get(`http://localhost:3000/api/users/${userId}`, { withCredentials: true });
-    profile.value = profileResponse.data;
-  } catch (error) {
-    console.error('Error fetching profile:', error);
-    router.push('/login');
-  }
-});
+- **Vue.js 3**: Frontend framework with Composition API
+- **Pinia**: State management
+- **Axios**: API requests
+- **Socket.io-client**: Real-time communication
+- **Font Awesome**: Icon library
+- **CSS**: Custom styling with responsive design
 
 
-4. Benefits of This Approach
-Centralized State: The userId is managed in a single place (Pinia store), making it easier to access and update.
-Route Protection: The navigation guard ensures that only authenticated users can access protected routes.
-Dynamic Handling: The userId is dynamically fetched and validated, preventing errors when it is missing.
-Separation of Concerns: The logic for managing authentication is decoupled from App.vue, making the code cleaner and more maintainable.
-Let me know if you need further clarification or help implementing this!
+### Backend
+
+- **Node.js \& Express**: Server-side framework[^8]
+- **MySQL**: Relational database
+- **Socket.io**: Websocket server for real-time features
+- **JWT**: Authentication with httpOnly cookies[^8]
+- **Argon2**: Secure password hashing
+- **Multer**: File uploads
+
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js (v14+)
+- MySQL Server
+- Git
+
+
+### Installation
+
+1. **Clone the repository**
+
+```bash
+git clone https://github.com/yourusername/social-media.git
+cd social-media
+```
+
+2. **Set up the backend**
+
+```bash
+cd backend
+npm install
+```
+
+3. **Configure environment variables**
+Create a .env file in the backend directory:
+
+```
+DB_HOST=localhost
+DB_USER=root
+DB_PASSWORD=yourpassword
+DB_NAME=social_media
+JWT_SECRET=your_jwt_secret
+PORT=3000
+```
+
+4. **Set up the database**
+Run the SQL schema in the database directory using your MySQL client.
+5. **Set up the frontend**
+
+```bash
+cd ../frontend
+npm install
+```
+
+6. **Configure the frontend API endpoint**
+Update the backendURL in auth.js if needed:
+
+```javascript
+const backendURL = 'http://localhost:3000';
+```
+
+7. **Run the application**
+
+In one terminal (backend):
+
+```bash
+cd backend
+npm run dev
+```
+
+In another terminal (frontend):
+
+```bash
+cd frontend
+npm run dev
+```
+
+8. **Access the application**
+Open your browser and navigate to http://localhost:5173
+
+## 📦 Building for Production
+
+### Frontend
+
+```bash
+cd frontend
+npm run build
+```
+
+The build artifacts will be stored in the dist directory.
+
+### Backend
+
+```bash
+cd backend
+npm run build
+```
+
+
+## 🧪 Project Structure
+
+```
+social-media/
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── views/
+│   │   ├── store/
+│   │   ├── router/
+│   │   ├── App.vue
+│   │   └── main.js
+│   └── package.json
+├── backend/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── middleware/
+│   ├── utils/
+│   ├── server.js
+│   └── package.json
+└── README.md
+```
+
+
+## 🔒 Authentication Flow
+
+The authentication uses JWT tokens stored in httpOnly cookies for security:
+
+1. User registers or logs in
+2. Server generates a JWT token
+3. Token is stored as an httpOnly cookie
+4. API requests include this cookie (withCredentials: true)
+5. Backend validates the token on protected routes
+
+## 📱 Responsive Design
+
+The application is fully responsive:
+
+- **Desktop**: Full featured with sidebars
+- **Tablet**: Modified layout with collapsible elements
+- **Mobile**: Optimized single-column view with mobile-friendly navigation
+
+
+## 📝 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
