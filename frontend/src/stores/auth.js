@@ -77,7 +77,7 @@ export const useAuthStore = defineStore('auth', {
     },
     async login(identifier, password) {
       try{
-        await axios.post(`${this.backendURL}/api/users/login`, {
+        const response = await axios.post(`${this.backendURL}/api/users/login`, {
           identifier: identifier,
           password: password,
         }, { withCredentials: true });
