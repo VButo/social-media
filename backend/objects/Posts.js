@@ -71,7 +71,7 @@ class Post {
 
   //GET ALL likeS ON A POST
   async getPostlikes(postId) {
-    const sql = 'SELECT u.*, l.createdAt AS likedAt FROM user u JOIN postlike l ON u.userId = l.userId WHERE l.postId = ?';
+    const sql = 'SELECT u.*, l.createdAt AS likedAt FROM user u JOIN postlike l ON u.userId = l.userId WHERE l.postId = ?;';
     const values = [postId];
     const result = await this.db.query(sql, values);
     return result[0];

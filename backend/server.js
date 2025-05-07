@@ -11,7 +11,6 @@ import http from 'http';
 import { Server } from 'socket.io';
 
 console.log("FRONTEND_URL being used:", process.env.FRONTEND_URL);
-console.log("NEWEST GIT PUSH 2");
 
 const app = express();
 const frontPort = 5500;
