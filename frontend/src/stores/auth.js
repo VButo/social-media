@@ -23,7 +23,6 @@ export const useAuthStore = defineStore('auth', {
     },
     async fetchUser() {
       try {
-        console.log("Token cookie found, validating...");
         const response = await axios.get(`${this.backendURL}/api/users/validate`, { 
           withCredentials: true 
         });

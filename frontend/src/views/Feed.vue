@@ -38,7 +38,6 @@
     if (!authStore.userId) {
       await authStore.fetchUser();
     }
-
     if (authStore.userId) {
       authStore.getFollowingUsers();
       console.log('followingUsers', authStore.followingUsers);
