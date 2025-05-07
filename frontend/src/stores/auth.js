@@ -75,6 +75,17 @@ export const useAuthStore = defineStore('auth', {
         sessionStorage.removeItem('user');
       }
     },
+    async login(identifier, password) {
+      try{
+        await axios.post(`${this.backendURL}/api/users/login`, {
+          identifier: identifier,
+          password: password,
+        }, { withCredentials: true });
+
+        this.userId = response.data.userId;
+        this.isAuthenticated = true;
+      }
+    },
     async getComments(postId) {
       try {
         const response = await axios.get(`${this.backendURL}/api/comments/${postId}`, { withCredentials: true });
