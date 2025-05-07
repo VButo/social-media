@@ -11,13 +11,13 @@ Backend API: [https://social-media-nbs1.onrender.com](https://social-media-nbs1.
 ## ✨ Features
 
 - **User Authentication**: Secure registration and login
-- **User Profiles**: Customizable profiles with bio and profile picture upload[^1][^9]
-- **Posts Feed**: View posts from followed users[^2][^6]
-- **Post Interaction**: Create posts with images, like and comment on posts[^6][^8]
-- **Comments \& Replies**: Threaded comment system with replies[^12]
-- **Real-time Chat**: Private messaging between users using Socket.io[^1][^5]
-- **Follow System**: Follow/unfollow other users[^8]
-- **Responsive Design**: Mobile-friendly interface[^12]
+- **User Profiles**: Customizable profiles with bio and profile picture upload
+- **Posts Feed**: View posts from followed users
+- **Post Interaction**: Create posts with images, like and comment on posts
+- **Comments \& Replies**: Threaded comment system with replies
+- **Real-time Chat**: Private messaging between users using Socket.io
+- **Follow System**: Follow/unfollow other users
+- **Responsive Design**: Mobile-friendly interface
 
 
 ## 🛠️ Technology Stack
@@ -34,10 +34,10 @@ Backend API: [https://social-media-nbs1.onrender.com](https://social-media-nbs1.
 
 ### Backend
 
-- **Node.js \& Express**: Server-side framework[^8]
+- **Node.js \& Express**: Server-side framework
 - **MySQL**: Relational database
 - **Socket.io**: Websocket server for real-time features
-- **JWT**: Authentication with httpOnly cookies[^8]
+- **JWT**: Authentication with httpOnly cookies
 - **Argon2**: Secure password hashing
 - **Multer**: File uploads
 
