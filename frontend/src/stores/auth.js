@@ -84,6 +84,9 @@ export const useAuthStore = defineStore('auth', {
 
         this.userId = response.data.userId;
         this.isAuthenticated = true;
+      } catch (error) {
+        console.error('Login error:', error);
+        throw error;
       }
     },
     async getComments(postId) {
