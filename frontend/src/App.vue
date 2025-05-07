@@ -41,10 +41,8 @@ watch(search, (newSearch) => {
 
 
 onMounted(async () => {
-  if (authStore.isAuthenticated) {
-    await authStore.fetchUser();
-  console.log('User fetched:', authStore.userId)
-  } else {
+  await authStore.fetchUser();
+  if (!authStore.isAuthenticated) {
     console.log('Not authenticated, redirecting to login')
     router.push('/login');
   }

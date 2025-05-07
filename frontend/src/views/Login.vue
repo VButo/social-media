@@ -29,7 +29,6 @@ onMounted(async () => {
     console.log('User is authenticated:', authStore.userId);
     router.push('/');
   } else {
-    router.push('/login');
     console.log('User is not authenticated');
   }
 });
