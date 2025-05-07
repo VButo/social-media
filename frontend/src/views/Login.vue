@@ -52,7 +52,8 @@ onMounted(async () => {
 const login = async () => {
   console.log('Logging in with:', identifier.value, password.value);
 
-  authStore.login(identifier.value, password.value);
+  await authStore.login(identifier.value, password.value);
+  console.log('user is loged in');
   router.push('/');
 };
 </script>
