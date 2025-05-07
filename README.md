@@ -89,10 +89,11 @@ npm install
 ```
 
 6. **Configure the frontend API endpoint**
-Update the backendURL in auth.js if needed:
+Update the backendURL and frontendURL in auth.js if needed:
 
 ```javascript
-const backendURL = 'http://localhost:3000';
+const backendURL = 'http://localhost:3000'; //change if needed
+const frontendURL = 'http://localhost:5173'; //change if needed
 ```
 
 7. **Run the application**
