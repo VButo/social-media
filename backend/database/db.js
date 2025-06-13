@@ -1,9 +1,7 @@
 import mysql from 'mysql2/promise';
 import dotenv from 'dotenv';
-import { Connector } from '@google-cloud/cloud-sql-connector';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { GoogleAuth } from 'google-auth-library';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -11,25 +9,13 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 export const connectDB = async () => {
     try {
-        const credentialsJson = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
-        
-        const connector = new Connector({
-            auth: new GoogleAuth({
-                credentials: credentialsJson,
-                scopes: ['https://www.googleapis.com/auth/sqlservice.admin']
-            })
-        });
-        
-        const clientOpts = await connector.getOptions({
-            instanceConnectionName: process.env.INSTANCE_CONNECTION_NAME,
-            ipType: process.env.DB_IP_TYPE || 'PUBLIC'
-        });
-
         const connection = await mysql.createConnection({
-            ...clientOpts,
+            host: process.env.DB_HOST,
+            port: process.env.DB_PORT,
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME
+            database: process.env.DB_NAME,
+            ssl: process.env.CA_CERT
         });
         
         console.log(`Connected to database: ${process.env.DB_NAME}`);
