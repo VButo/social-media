@@ -15,7 +15,9 @@ export const connectDB = async () => {
             user: process.env.DB_USER,
             password: process.env.DB_PASSWORD,
             database: process.env.DB_NAME,
-            ssl: process.env.CA_CERT
+            ssl: {
+                ca: process.env.CA_CERT
+            }
         });
         
         console.log(`Connected to database: ${process.env.DB_NAME}`);
