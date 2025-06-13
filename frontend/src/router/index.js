@@ -11,13 +11,6 @@ const router = createRouter({
       name: 'feed',
       component: () => import('@/views/Feed.vue'),
     },
-    /* 
-    {
-      path: '/profile/:username',
-      name: 'profile',
-      component: () => import('@/views/Profile.vue'),
-    },
-    */
    {
     path: '/profile/:id',
     name: 'profile',
@@ -44,7 +37,7 @@ const router = createRouter({
 router.beforeEach(async (to, from, next) => {
   const authStore = useAuthStore();
 
-  if (!authStore.isAuthenticated && document.cookie.includes('token')) {
+  if (!authStore.isAuthenticated) {
     await authStore.fetchUser();
   }
 

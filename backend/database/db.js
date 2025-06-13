@@ -5,22 +5,18 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { GoogleAuth } from 'google-auth-library';
 
-// Get current file's directory for proper .env loading
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 export const connectDB = async () => {
     try {
-        // Parse the credentials JSON
         const credentialsJson = JSON.parse(process.env.GOOGLE_APPLICATION_CREDENTIALS_JSON);
         
-        // Create connector with proper configuration
         const connector = new Connector({
-            // Directly create GoogleAuth with credentials and required scope
             auth: new GoogleAuth({
-                credentials: credentialsJson,  // Pass credentials object directly
-                scopes: ['https://www.googleapis.com/auth/sqlservice.admin']  // Required scope
+                credentials: credentialsJson,
+                scopes: ['https://www.googleapis.com/auth/sqlservice.admin']
             })
         });
         

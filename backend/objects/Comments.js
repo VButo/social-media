@@ -96,7 +96,7 @@ class Comment {
         return result[0].affectedRows > 0;
     }
 
-    //UNlike A REPLY
+    //unlike A REPLY
     async unlikeReply(userId, replyId) {
         const sql = `DELETE FROM replylike WHERE userId = ? AND replyId = ?;`;
         const values = [userId, replyId];

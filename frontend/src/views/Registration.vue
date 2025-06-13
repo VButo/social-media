@@ -47,7 +47,6 @@ const validatePasswordMatch = () => {
       : 'Passwords do not match.';
 };
 
-// Computed property to check if the form is valid
 const isFormValid = computed(() => {
   return (
     emailError.value === '' &&
